@@ -3,7 +3,7 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	height: 100dvh;
+	height: 100%;
 	text-align: center;
 }
 
@@ -11,6 +11,7 @@ h1 {
 	font-size: 3rem;
 	margin-bottom: 2rem;
   color: #fff;
+  margin-bottom: 100px;
 }
 
 nav a {
