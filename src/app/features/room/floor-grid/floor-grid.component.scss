@@ -1,13 +1,12 @@
 :host {
 	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	align-items: flex-start;
-	flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
     position: absolute;
-    width: 86.7vh;
-    height: 86.7vh;
-	transform: rotateX(65deg) rotateZ(-45deg);
-    top: 17.9%;
-    left: 20.5%;
+    height: 102.8%;
+    aspect-ratio: 1;
+    transform: rotateX(65deg) rotateZ(-45deg);
+    top: 11.9%;
 }
