@@ -1,0 +1,27 @@
+:host {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	text-align: center;
+}
+
+h1 {
+	font-size: 3rem;
+	margin-bottom: 2rem;
+}
+
+nav a {
+	font-size: 1.5rem;
+	padding: 1rem 2rem;
+	border: 1px solid #fff;
+	text-decoration: none;
+	color: #fff;
+	transition: background-color 0.3s, color 0.3s;
+
+	&:hover {
+		background-color: #fff;
+		color: #000;
+	}
+}

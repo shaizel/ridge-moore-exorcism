@@ -1,0 +1,8 @@
+:host {
+  display: inline-block;
+}
+
+div {
+  background-repeat: no-repeat;
+  image-rendering: pixelated; /* Sharp edges for pixel art */
+}

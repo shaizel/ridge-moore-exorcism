@@ -1,0 +1,19 @@
+services:
+  app:
+    # Build the image using the Dockerfile in the current directory
+    build:
+      context: .
+      # Target the 'builder' stage, which has the dev environment
+      target: builder
+    # Override the Dockerfile's CMD to run the Angular dev server
+    # The '--host 0.0.0.0' flag is necessary to access the server from outside the container
+    command: npm start -- --host 0.0.0.0 --poll 1000
+    ports:
+      # Map port 4200 on your local machine to port 4200 in the container
+      - "4200:4200"
+    volumes:
+      # Mount your local source code into the container at /app
+      - .:/app
+      # Use an anonymous volume to prevent your local node_modules from overwriting the container's
+      - /app/node_modules
+    

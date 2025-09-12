@@ -1,0 +1,11 @@
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore the build output
+dist/
+
+# Ignore local development files
+.angular/
+.vscode/
+.git/
+npm-debug.log

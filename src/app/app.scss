@@ -1,0 +1,33 @@
+@use "sass:list";
+
+// Function to generate a layer of stars
+// $n: number of stars
+// $size: size of the stars
+@function generate-stars($n, $size) {
+	$stars: ();
+
+	@for $i from 1 through $n {
+		$x: random(100) + vw;
+		$y: random(100) + vh;
+		$stars: list.append($stars, radial-gradient($size circle at $x $y, white, transparent), comma);
+	}
+
+	@return $stars;
+}
+
+:host {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	overflow: hidden; // Prevents scrollbars if stars are generated at the very edge
+
+	// Layer multiple backgrounds for different star sizes to create depth
+	background-image: 
+		generate-stars(80, 1px), // A layer of 100 small stars
+		generate-stars(25, 2px), // A layer of 50 medium stars
+		generate-stars(10, 3px); // A layer of 20 large stars
+}
