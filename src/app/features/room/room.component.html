@@ -1,8 +1,11 @@
 @if (roomData(); as data) {
 	@defer (on viewport) {
 		<img [src]="data.image" alt="Room Image" class="room-image" />
+		<app-floor-grid mode="background"></app-floor-grid>
 
-		<app-floor-grid class="floor-grid"></app-floor-grid>
+		<ng-content />
+
+		<app-floor-grid mode="foreground"></app-floor-grid>
 	} @placeholder {
 		<div class="room-image-placeholder">Loading room...</div>
 	}

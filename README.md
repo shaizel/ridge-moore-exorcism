@@ -1,13 +1,27 @@
 # RidgeMooreExorcism
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.1.4.
+A 2D top-down horror game built with Angular.
+
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 20.1.4.
 
 ## Development server
 
-To start a local development server, run:
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+
+## Building
+
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+
+## Running unit tests
+
+Run `ng test` to execute the unit tests via Jest.
+
+## Further help
+
+To get more help on the Angular CLI use `ng help` or go check out the Angular CLI Overview and Command Reference page.
 
 ```bash
-ng serve
+ng e2e
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
@@ -28,7 +42,7 @@ ng generate --help
 
 ## Building
 
-To build the project run:
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ```bash
 ng build
@@ -38,7 +52,7 @@ This will compile your project and store the build artifacts in the `dist/` dire
 
 ## Running unit tests
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+To execute unit tests with [Jest](https://jestjs.io/), use the following command:
 
 ```bash
 ng test
