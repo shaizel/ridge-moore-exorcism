@@ -15,8 +15,8 @@ export const routes: Routes = [
 		path: 'demo',
 		loadComponent: () => import('./demo/demo').then((m) => m.Demo),
 	},
-    {
-        path: '**',
-        redirectTo: 'main-menu',
-    }
+	{
+		path: '**',
+		redirectTo: 'main-menu',
+	}
 ];

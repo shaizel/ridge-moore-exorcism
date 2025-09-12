@@ -4,15 +4,16 @@
 // $n: number of stars
 // $size: size of the stars
 @function generate-stars($n, $size) {
-	$stars: ();
+	$stars: (
+	);
 
-	@for $i from 1 through $n {
-		$x: random(100) + vw;
-		$y: random(100) + vh;
-		$stars: list.append($stars, radial-gradient($size circle at $x $y, white, transparent), comma);
-	}
+@for $i from 1 through $n {
+	$x: random(100) + vw;
+	$y: random(100) + vh;
+	$stars: list.append($stars, radial-gradient($size circle at $x $y, white, transparent), comma);
+}
 
-	@return $stars;
+@return $stars;
 }
 
 :host {
@@ -21,7 +22,7 @@
 	justify-content: center;
 	align-items: center;
 	width: 100dvw;
-    height: 100dvh;
+	height: 100dvh;
 	max-width: 100dvw;
 	max-height: 100dvh;
 	background-color: black;
@@ -29,7 +30,7 @@
 	user-select: none;
 
 	// Layer multiple backgrounds for different star sizes to create depth
-	background-image: 
+	background-image:
 		generate-stars(80, 1px), // A layer of 100 small stars
 		generate-stars(25, 2px), // A layer of 50 medium stars
 		generate-stars(10, 3px); // A layer of 20 large stars

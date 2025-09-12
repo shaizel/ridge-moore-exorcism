@@ -1,11 +1,11 @@
 {
-    "angular-schematics.schematicsDefaultOptions": {
-        "angular-*": {
-            "externalTemplate": true,
-            "style": "scss",
-            "editor.detectIndentation": false,
-            "editor.insertSpaces": false,
-            "editor.tabSize": 4
-        }
-    }
+	"angular-schematics.schematicsDefaultOptions": {
+		"angular-*": {
+			"externalTemplate": true,
+			"style": "scss",
+			"editor.detectIndentation": false,
+			"editor.insertSpaces": false,
+			"editor.tabSize": 4
+		}
+	}
 }
