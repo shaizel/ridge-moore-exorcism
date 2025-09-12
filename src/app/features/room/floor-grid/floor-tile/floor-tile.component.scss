@@ -1,0 +1,25 @@
+:host {
+	display: block;
+	width: calc(100% / 12);
+    height: calc(100% / 12);
+	cursor: pointer;
+
+	&.selected {
+		.tile-container {
+			background: rgba(0, 143, 0, 0.418);
+
+			&:hover {
+				background: rgba(0, 255, 0, 0.418);
+			}
+		}
+	}
+
+	.tile-container {
+		width: 100%;
+		height: 100%;
+
+		&:hover {
+			background: rgba(0, 255, 255, 0.349);
+		}
+	}
+}

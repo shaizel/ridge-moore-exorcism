@@ -26,6 +26,7 @@
 	max-height: 100dvh;
 	background-color: black;
 	overflow: hidden; // Prevents scrollbars if stars are generated at the very edge
+	user-select: none;
 
 	// Layer multiple backgrounds for different star sizes to create depth
 	background-image: 

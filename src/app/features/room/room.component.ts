@@ -1,13 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { ROOM_CONFIG, RoomType } from './room-types';
+import { FloorGridComponent } from "./floor-grid/floor-grid.component";
 
 @Component({
   selector: 'app-room',
   standalone: true,
   imports: [
     CommonModule,
-  ],
+    FloorGridComponent
+],
   templateUrl: './room.component.html',
   styleUrl: './room.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
