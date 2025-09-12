@@ -1,3 +1,7 @@
 @if (roomData(); as data) {
-  <img [src]="data.image" alt="Room Image" class="room-image" />
+	@defer (on viewport) {
+		<img [src]="data.image" alt="Room Image" class="room-image" />
+	} @placeholder {
+		<div class="room-image-placeholder">Loading room...</div>
+	}
 }
