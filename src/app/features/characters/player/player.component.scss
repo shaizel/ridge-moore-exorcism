@@ -1,0 +1,18 @@
+:host {
+	display: block;
+	position: absolute;
+	height: 20%;
+	max-width: 20%;
+	max-height: 20%;
+	aspect-ratio: 1;
+
+	.shadow-box {
+		width: 20%;
+		height: 10%;
+		background: radial-gradient(rgba(0, 0, 0, 0.4) 40%, transparent 70%);
+		border-radius: 50%;
+		position: absolute;
+		bottom: 29%;
+		left: 40%;
+	}
+}

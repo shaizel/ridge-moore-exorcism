@@ -1,8 +1,14 @@
 :host {
-  display: inline-block;
-}
+	display: block;
+	width: 100%;
+    height: 100%;
+	position: relative;
 
-div {
-  background-repeat: no-repeat;
-  image-rendering: pixelated; /* Sharp edges for pixel art */
+	.sprite-container {
+		background-repeat: no-repeat;
+		image-rendering: pixelated; // Sharp edges for pixel art
+		background-size: auto 100%;
+		width: 100%;
+    	height: 100%;
+	}
 }

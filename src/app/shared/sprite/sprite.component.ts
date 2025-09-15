@@ -1,6 +1,7 @@
 import { CommonModule, NgStyle } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
 import { AnimationName, SPRITE_CONFIG, SpriteType } from './sprite-types';
+import { FRAMERATE } from '../../core/services/constants';
 
 @Component({
 	selector: 'app-sprite',
@@ -28,10 +29,10 @@ export class SpriteComponent {
 			this.animationFrame.set(0); // Reset frame on animation change
 
 			// Only animate if there is more than one frame
-			if (animationConfig.frames > 1) {
+			if (animationConfig.frameCount > 1) {
 				this.animationInterval = setInterval(() => {
-					this.animationFrame.update((frame) => (frame + 1) % animationConfig.frames);
-				}, 150); // ~6-7 FPS animation
+					this.animationFrame.update((frame) => (frame + 1) % animationConfig.frameCount);
+				}, FRAMERATE); // ~6-7 FPS animation
 				onCleanup(() => clearInterval(this.animationInterval));
 			}
 		});
@@ -43,14 +44,15 @@ export class SpriteComponent {
 		const frame = this.animationFrame();
 
 		const animationConfig = config.animations[animation];
-		const bgX = -frame * config.frameWidth;
-		const bgY = -animationConfig.row * config.frameHeight;
+		// If frameCount is 1, bgY should be 0. Otherwise, calculate percentage.
+		const bgY = animationConfig.frameCount > 1 ? (-frame * 100) / (animationConfig.frameCount - 1) : 0;
+
+		// If animationCount is 1, bgX should be 0. Otherwise, calculate percentage.
+		const bgX = config.animationCount > 1 ? (animationConfig.index * 100) / (config.animationCount - 1) : 0;
 
 		return {
 			'background-image': `url(${config.path})`,
-			'width.px': config.frameWidth,
-			'height.px': config.frameHeight,
-			'background-position': `${bgX}px ${bgY}px`,
+			'background-position': `${bgX}% ${bgY}%`,
 		};
 	});
 }

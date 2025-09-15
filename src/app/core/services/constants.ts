@@ -1,3 +1,4 @@
 export const GRID_WIDTH = 12;
 export const GRID_HEIGHT = 12;
-export const TILE_HEIGHT_OFFSET = 100;
+export const FRAMERATE = 150;
+export const GRID_TILE_SIZE = 10; // TODO: Remove this?

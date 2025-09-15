@@ -1,6 +1,5 @@
 @if (roomData(); as data) {
 	@defer (on viewport) {
-		<img [src]="data.image" alt="Room Image" class="room-image" />
 		<app-floor-grid mode="background"></app-floor-grid>
 
 		<ng-content />

@@ -1,29 +1,55 @@
-export type SpriteType = 'player';
-export type AnimationName = 'faceS' | 'faceW' | 'faceE' | 'faceN';
+export type SpriteType = "priest" | "ghost" | "shadow";
+export type AnimationName = "faceS" | "faceW" | "faceE" | "faceN";
 
 export interface SpriteConfig {
-  path: string;
-  frameWidth: number;
-  frameHeight: number;
-  animations: Record<
-    AnimationName,
-    {
-      row: number;
-      frames: number;
-    }
-  >;
+	path: string;
+	animationCount: number;
+	maxFrameCount: number;
+	animationHeightPercentage: number;
+	animations: Record<
+		AnimationName,
+		{
+			index: number;
+			frameCount: number;
+		}
+	>;
 }
 
 export const SPRITE_CONFIG: Record<SpriteType, SpriteConfig> = {
-  player: {
-    path: 'assets/sprites/player.png',
-    frameWidth: 64,
-    frameHeight: 64,
-    animations: {
-      faceS: { row: 0, frames: 1 },
-      faceW: { row: 1, frames: 1 },
-      faceE: { row: 2, frames: 1 },
-      faceN: { row: 3, frames: 1 },
-    },
-  },
+	priest: {
+		path: "assets/sprites/priest.png",
+		animationCount: 4,
+		maxFrameCount: 1,
+		animationHeightPercentage: 20,
+		animations: {
+			faceS: { index: 0, frameCount: 1 },
+			faceW: { index: 1, frameCount: 1 },
+			faceE: { index: 2, frameCount: 1 },
+			faceN: { index: 3, frameCount: 1 },
+		},
+	},
+	ghost: {
+		path: "assets/sprites/ghost.png",
+		animationCount: 4,
+		maxFrameCount: 1,
+		animationHeightPercentage: 20,
+		animations: {
+			faceS: { index: 0, frameCount: 1 },
+			faceW: { index: 1, frameCount: 1 },
+			faceE: { index: 2, frameCount: 1 },
+			faceN: { index: 3, frameCount: 1 },
+		},
+	},
+	shadow: {
+		path: "assets/sprites/shadow.png",
+		animationCount: 4,
+		maxFrameCount: 1,
+		animationHeightPercentage: 20,
+		animations: {
+			faceS: { index: 0, frameCount: 1 },
+			faceW: { index: 1, frameCount: 1 },
+			faceE: { index: 2, frameCount: 1 },
+			faceN: { index: 3, frameCount: 1 },
+		},
+	},
 };

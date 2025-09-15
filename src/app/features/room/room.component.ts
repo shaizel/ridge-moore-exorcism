@@ -12,7 +12,10 @@ import { FloorGridComponent } from "./floor-grid/floor-grid.component";
 	],
 	templateUrl: './room.component.html',
 	styleUrl: './room.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush
+	changeDetection: ChangeDetectionStrategy.OnPush,
+	host: {
+		'[style.background-image]': 'backgroundImage()',
+	}
 })
 export class RoomComponent {
 	/**
@@ -22,4 +25,6 @@ export class RoomComponent {
 
 	/** A computed signal to get the room's configuration data based on its type. */
 	public roomData = computed(() => ROOM_CONFIG[this.roomType()]);
+
+	public backgroundImage = computed(() => `url(${this.roomData().image})`);
 }

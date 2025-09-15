@@ -15,5 +15,5 @@ services:
       # Mount your local source code into the container at /app
       - .:/app
       # Use an anonymous volume to prevent your local node_modules from overwriting the container's
-      - /app/node_modules
+      - /app/node_modules 
     

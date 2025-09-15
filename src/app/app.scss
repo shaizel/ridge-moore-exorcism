@@ -1,15 +1,17 @@
 @use "sass:list";
+@use "sass:math";
+
 
 // Function to generate a layer of stars
 // $n: number of stars
 // $size: size of the stars
-@function generate-stars($n, $size) {
+@function generate-stars($n, $size) { 
 	$stars: (
 	);
 
 @for $i from 1 through $n {
-	$x: random(100) + vw;
-	$y: random(100) + vh;
+	$x: math.random(100) + vw;
+	$y: math.random(100) + vh;
 	$stars: list.append($stars, radial-gradient($size circle at $x $y, white, transparent), comma);
 }
 

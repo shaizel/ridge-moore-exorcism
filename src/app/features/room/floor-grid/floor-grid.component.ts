@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, OnInit } from '@angular/core';
 import { FloorTileComponent } from './floor-tile/floor-tile.component';
 import { GRID_HEIGHT, GRID_WIDTH } from '../../../core/services/constants';
 import { ITile } from '../../../core/interfaces/inerfaces';
@@ -11,6 +11,8 @@ import { ITile } from '../../../core/interfaces/inerfaces';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FloorGridComponent implements OnInit {
+	public mode = input.required<"foreground" | "background">();
+
 	public tiles: ITile[][] = [];
 	public selectedTile?: ITile;
 
