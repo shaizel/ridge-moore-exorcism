@@ -4,12 +4,32 @@
 	height: calc(100% / 12);
 	cursor: pointer;
 
-	&.selected {
+	&.start {
 		.tile-container {
-			background: rgba(0, 143, 0, 0.418);
+			background: rgba(0, 79, 143, 0.5);
 
 			&:hover {
-				background: rgba(0, 255, 0, 0.418);
+				background: rgba(0, 108, 197, 0.5);
+			}
+		}
+	}
+
+	&.path {
+		.tile-container {
+			background: rgba(0, 143, 0, 0.5);
+
+			&:hover {
+				background: rgba(0, 231, 0, 0.5);
+			}
+		}
+	}
+
+	&.selected {
+		.tile-container {
+			background: rgba(110, 0, 0, 0.5);
+
+			&:hover {
+				background: rgba(185, 0, 0, 0.5);
 			}
 		}
 	}

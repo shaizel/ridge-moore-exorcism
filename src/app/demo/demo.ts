@@ -6,6 +6,9 @@ import { GhostComponent } from "../features/characters/ghost/ghost.component";
 import { ShadowComponent } from "../features/characters/shadow/shadow.component";
 import { RoomObject, RoomStore } from '../features/room/room.store';
 import { PlayerStore } from '../features/characters/player/player.store';
+import { PathService } from '../core/services/path.service';
+import { GridStore } from '../features/room/floor-grid/grid.store';
+import { GridPositionDirective } from '../shared/directives/grid-position.directive';
 
 export interface RoomDefinition {
 	id: number;
@@ -28,18 +31,25 @@ export interface Position {
 	standalone: true,
 	templateUrl: './demo.html',
 	styleUrl: './demo.scss',
- 	imports: [RoomComponent, PlayerComponent, GhostComponent, ShadowComponent],
+ 	imports: [RoomComponent, PlayerComponent, GhostComponent, ShadowComponent, GridPositionDirective],
 
 })
 export class Demo {
 	private audioService: AudioService = inject(AudioService);
-	private roomStore = inject(RoomStore);
-	private playerStore = inject(PlayerStore);
+	public roomStore = inject(RoomStore);
+	public playerStore = inject(PlayerStore);
+	private gridStore = inject(GridStore);
+
+	private pathService = inject(PathService);
+
 
 	ngOnInit() {
 		this.audioService.playAmbientMusic();
 
+		this.enterRoom(0);
+		
 
+		// this.gridStore.setScoredGrid(this.pathService.getScoredGrid(this.playerStore.position()));
 	}
 
 	ngOnDestroy() {
@@ -57,6 +67,7 @@ export class Demo {
         // 3. Use the room's definition to set the player's starting position
         // We can create a dedicated method in the PlayerStore for this.
         this.playerStore.setPosition(playerData.position);
+		this.gridStore.setScoredGrid(this.pathService.getScoredGrid(playerData.position))
     }
 
     private fetchLevelData(levelId: number): { roomData: RoomDefinition, playerData: PlayerDefinition } {
@@ -68,7 +79,10 @@ export class Demo {
 				name: 'Demo',
 				backgroundImage: 'assets/rooms/brick-wall.png',
 				objects: [
-					{ id: 0, type: 'chair', position: { x: 12, y: 10 }, sprite: 'assets/objects/fountain.png', isSolid: true },
+					{ id: 0, type: 'chair', position: { x: 8, y: 10 }, sprite: 'assets/static/chair.png', isSolid: true },
+					{ id: 1, type: 'chair', position: { x: 2, y: 4 }, sprite: 'assets/static/chair.png', isSolid: true },
+					{ id: 2, type: 'chair', position: { x: 7, y: 6 }, sprite: 'assets/static/chair.png', isSolid: true },
+					{ id: 3, type: 'chair', position: { x: 9, y: 2 }, sprite: 'assets/static/chair.png', isSolid: true },
 				]
 			},
 			playerData: {

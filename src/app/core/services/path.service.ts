@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { Position } from '../../features/characters/player/player.store';
 import { RoomObject, RoomStore } from '../../features/room/room.store';
-import { GRID_HEIGHT, GRID_WIDTH } from './constants';
+import { GRID_CELL_BLOCKED as BLOCKED_GRID_CELL, GRID_HEIGHT, GRID_WIDTH } from './constants';
+import { Grid } from '../interfaces/inerfaces';
 
 @Injectable({providedIn: 'root'})
 export class PathService {
@@ -15,69 +16,63 @@ export class PathService {
 	 * @param maxRange An optional maximum range to calculate scores for. Cells beyond this range will be `Infinity`.
 	 * @returns A 2D array where each cell's value is its distance from the start.
 	 */
-	public getScoredGrid(start: Position, maxRange: number = Infinity): number[][] {
-		const objects = this.roomStore.objects();
-		const obstacleGrid = this.createGrid(objects);
+	public getScoredGrid(start: Position, maxRange: number = Infinity): Grid {
+		const grid: Grid = this.initializeGrid();
 
-		const scoredGrid: number[][] = Array.from({ length: GRID_WIDTH }, () =>
-			Array(GRID_HEIGHT).fill(Infinity)
-		);
-
-		if (this.isInvalidPosition(start, obstacleGrid)) {
+		if (this.isInvalidPosition(start, grid)) {
 			console.warn('Start position is invalid or an obstacle.');
-			return scoredGrid;
+			return grid;
 		}
 
 		const openSet: Position[] = [start];
-		scoredGrid[start.x][start.y] = 0;
+		grid[start.x][start.y] = 0;
 
 		let head = 0;
 		while (head < openSet.length) {
 			const currentPos = openSet[head++];
-			const currentScore = scoredGrid[currentPos.x][currentPos.y];
+			const currentScore = grid[currentPos.x][currentPos.y];
 
 			if (currentScore >= maxRange) {
 				continue;
 			}
 
-			const neighbors = this.getNeighbors(currentPos, obstacleGrid);
+			const neighbors = this.getNeighbors(currentPos, grid);
 			for (const neighborPos of neighbors) {
-				if (scoredGrid[neighborPos.x][neighborPos.y] === Infinity) {
-					scoredGrid[neighborPos.x][neighborPos.y] = currentScore + 1;
+				if (grid[neighborPos.x][neighborPos.y] === Infinity) {
+					grid[neighborPos.x][neighborPos.y] = currentScore + 1;
 					openSet.push(neighborPos);
 				}
 			}
 		}
 
-		return scoredGrid;
-	}
-
-	public findPath(start: Position, destination: Position): Position[] {
-		const obstacleGrid = this.createGrid(this.roomStore.objects());
-
-		// Validate start and destination are within bounds and not on an obstacle
-		if (this.isInvalidPosition(start, obstacleGrid) || this.isInvalidPosition(destination, obstacleGrid)) {
-			console.warn('Start or destination is invalid or an obstacle.');
-			return [];
-		}
-
-		// 1. Get the grid of movement scores from the start position.
-		const scoredGrid = this.getScoredGrid(start);
-		// 2. Use the scored grid to reconstruct the path from the destination.
-		return this.reconstructPath(start, destination, obstacleGrid, scoredGrid);
-	}
-
-	private createGrid(objects: RoomObject[]): boolean[][] {
-		const grid = Array.from({ length: GRID_WIDTH }, () => Array(GRID_HEIGHT).fill(false));
-		for (const obj of objects) {
-			if (obj.isSolid && !this.isOutOfBounds(obj.position)) {
-				grid[obj.position.x][obj.position.y] = true; // true means obstacle
-			}
-		}
 		return grid;
 	}
 
-	private getNeighbors(pos: Position, grid: boolean[][]): Position[] {
+	public findPath(grid: Grid, destination: Position): Position[] {
+		// Validate destination is within bounds and not on an obstacle
+		if (this.isInvalidPosition(destination, grid)) {
+			console.warn('Destination is invalid or an obstacle.');
+			return [];
+		}
+
+		// Use the scored grid to reconstruct the path from the destination.
+		return this.reconstructPath(grid, destination);
+	}
+
+	private initializeGrid(): Grid {
+		const grid: Grid = Array.from({ length: GRID_WIDTH }, () => Array(GRID_HEIGHT).fill(Infinity));
+		const objects: RoomObject[] = this.roomStore.objects();
+
+		for (const object of objects) {
+			if (object.isSolid && !this.isOutOfBounds(object.position)) {
+				grid[object.position.x][object.position.y] = BLOCKED_GRID_CELL;
+			}
+		}
+
+		return grid;
+	}
+
+	private getNeighbors(pos: Position, grid: Grid): Position[] {
 		const neighbors: Position[] = [];
 		const { x, y } = pos;
 		const directions = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }]; // N, S, W, E
@@ -95,28 +90,33 @@ export class PathService {
 		return pos.x < 0 || pos.x >= GRID_WIDTH || pos.y < 0 || pos.y >= GRID_HEIGHT;
 	}
 
-	private isInvalidPosition(pos: Position, grid: boolean[][]): boolean {
-		return this.isOutOfBounds(pos) || grid[pos.x][pos.y];
+	private isInvalidPosition(pos: Position, grid: Grid): boolean {
+		return this.isOutOfBounds(pos) || grid[pos.x][pos.y] === BLOCKED_GRID_CELL;
 	}
 
-	private reconstructPath(start: Position, destination: Position, obstacleGrid: boolean[][], scoredGrid: number[][]): Position[] {
-		if (scoredGrid[destination.x][destination.y] === Infinity) {
+	private reconstructPath(grid: Grid, destination: Position): Position[] {
+		if (grid[destination.x][destination.y] === Infinity) {
 			return []; // Destination is not reachable
 		}
 
 		const path: Position[] = [];
 		let currentPos = destination;
 
-		while (currentPos.x !== start.x || currentPos.y !== start.y) {
+		while (grid[currentPos.x][currentPos.y] !== 0) {
 			path.unshift(currentPos);
-			const currentScore = scoredGrid[currentPos.x][currentPos.y];
-			const neighbors = this.getNeighbors(currentPos, obstacleGrid);
+			const currentScore = grid[currentPos.x][currentPos.y];
+			const neighbors = this.getNeighbors(currentPos, grid);
 
 			// Find the neighbor that leads back to the start (score is one less)
-			const nextStep = neighbors.find(
-				(neighbor) => scoredGrid[neighbor.x][neighbor.y] === currentScore - 1
-			);
-			currentPos = nextStep!; // We know a path exists, so nextStep will be found
+			const nextStep = neighbors.find((neighbor) => grid[neighbor.x][neighbor.y] === currentScore - 1);
+
+			if (!nextStep) {
+				// This should not happen if a path exists, but as a safeguard...
+				console.error('Path reconstruction failed: could not find next step from', currentPos);
+				return []; // or throw an error
+			}
+
+			currentPos = nextStep;
 		}
 
 		return path;

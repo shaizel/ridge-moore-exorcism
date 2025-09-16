@@ -7,7 +7,8 @@ import { Position } from '../../features/characters/player/player.store';
 	host: {
 		'[style.left.%]': 'left()',
 		'[style.top.%]': 'top()',
-		'[style.transform]': 'transform()'
+		'[style.transform]': 'transform()',
+		'[style.z-index]': 'zIndex()'
 	}
 })
 export class GridPositionDirective {
@@ -45,6 +46,13 @@ export class GridPositionDirective {
 	 */
 	public transform = computed(
 		() => `translate(${this.offsetX()}%, ${this.offsetY()}%)`
+	);
+
+	/**
+	 * Computes the 'z-index' CSS property based on the x and y position.
+	 */
+	public zIndex = computed(
+		() => 11 - this.appGridPosition().x + this.appGridPosition().y
 	);
 
 	constructor() {}

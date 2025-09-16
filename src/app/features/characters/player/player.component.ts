@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, effect, inject, viewChild } from '@angular/core';
 import { SpriteComponent } from "../../../shared/sprite/sprite.component";
 import { PlayerStore, Position } from './player.store';
-import { GridPositionDirective } from '../../../shared/directives/grid-position.directive';
+import { GridStore } from '../../room/floor-grid/grid.store';
+import { PathService } from 'src/app/core/services/path.service';
 
 @Component({
 	selector: 'app-player',
@@ -14,23 +15,21 @@ import { GridPositionDirective } from '../../../shared/directives/grid-position.
 	templateUrl: './player.component.html',
 	styleUrl: './player.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	hostDirectives: [
-		{
-			directive: GridPositionDirective,
-			inputs: ['appGridPosition', 'offsetX', 'offsetY'],
-		}, 
-	],
 })
 export class PlayerComponent implements OnInit, OnDestroy {
 	private sprite = viewChild.required(SpriteComponent);
 
 	private playerStore = inject(PlayerStore);
+	private gridStore = inject(GridStore);
+	private pathService = inject(PathService);
+
+
 	public position = this.playerStore.position;
 	public animation = this.playerStore.direction; // The animation should follow the store's direction 
 	public isMoving = this.playerStore.isMoving;
 
 	private movementInterval?: ReturnType<typeof setInterval>;
-	private readonly MOVEMENT_SPEED_MS = 200; // Move one square every 200ms
+	private readonly MOVEMENT_SPEED_MS = 300; // Move one square every 300ms
 
 	constructor() {
 		// Effect to start/stop the movement loop based on the store's isMoving flag
@@ -39,6 +38,9 @@ export class PlayerComponent implements OnInit, OnDestroy {
 				this.startMovementLoop();
 			} else {
 				this.stopMovementLoop();
+				this.gridStore.setScoredGrid(this.pathService.getScoredGrid(this.playerStore.position()))
+				this.gridStore.setPath([]);
+				this.gridStore.setSelectedPosition(null);
 			}
 		});
 	}

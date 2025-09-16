@@ -8,4 +8,11 @@
 	height: 100%;
 	width: 100%;
 	overflow: hidden;
+
+	.object {
+		position: absolute;
+		width: 5%;
+		aspect-ratio: 1;
+		pointer-events: none;
+	}
 }

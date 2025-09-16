@@ -1,5 +1,5 @@
 @for (tileRow of tiles; track $index) {
 	@for (tile of tileRow; track $index) {
-		<app-floor-tile [position]="tile.position" [class.selected]="selectedTile === tile" (selected)="selectedTile = tile"></app-floor-tile>
+		<app-floor-tile [position]="tile.position" (selected)="gridStore.setSelectedPosition(tile.position)"></app-floor-tile>
 	}
 }

@@ -5,6 +5,8 @@
 	max-width: 20%;
 	max-height: 20%;
 	aspect-ratio: 1;
+	transition: top 300ms ease-in, left 300ms ease-in;
+	pointer-events: none;
 
 	.shadow-box {
 		width: 20%;

@@ -1,24 +1,24 @@
-import { ChangeDetectionStrategy, Component, input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnInit } from '@angular/core';
 import { FloorTileComponent } from './floor-tile/floor-tile.component';
 import { GRID_HEIGHT, GRID_WIDTH } from '../../../core/services/constants';
 import { ITile } from '../../../core/interfaces/inerfaces';
+import { PlayerStore } from '../../characters/player/player.store';
+import { GridStore } from './grid.store';
 
 @Component({
 	selector: 'app-floor-grid',
 	imports: [FloorTileComponent],
 	templateUrl: './floor-grid.component.html',
 	styleUrl: './floor-grid.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FloorGridComponent implements OnInit {
 	public mode = input.required<"foreground" | "background">();
 
 	public tiles: ITile[][] = [];
-	public selectedTile?: ITile;
-
-	constructor() {
-		
-	}
+	
+	public gridStore = inject(GridStore);
+	public playerStore = inject(PlayerStore);
 
 	ngOnInit(): void {
 		this.tiles = Array.from({ length: GRID_HEIGHT }, (_, y) =>

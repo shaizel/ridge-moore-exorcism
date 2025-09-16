@@ -23,9 +23,9 @@ export const SPRITE_CONFIG: Record<SpriteType, SpriteConfig> = {
 		animationHeightPercentage: 20,
 		animations: {
 			faceS: { index: 0, frameCount: 1 },
-			faceW: { index: 1, frameCount: 1 },
-			faceE: { index: 2, frameCount: 1 },
-			faceN: { index: 3, frameCount: 1 },
+			faceE: { index: 1, frameCount: 1 },
+			faceN: { index: 2, frameCount: 1 },
+			faceW: { index: 3, frameCount: 1 },
 		},
 	},
 	ghost: {
@@ -35,9 +35,9 @@ export const SPRITE_CONFIG: Record<SpriteType, SpriteConfig> = {
 		animationHeightPercentage: 20,
 		animations: {
 			faceS: { index: 0, frameCount: 1 },
-			faceW: { index: 1, frameCount: 1 },
-			faceE: { index: 2, frameCount: 1 },
-			faceN: { index: 3, frameCount: 1 },
+			faceE: { index: 1, frameCount: 1 },
+			faceN: { index: 2, frameCount: 1 },
+			faceW: { index: 3, frameCount: 1 },
 		},
 	},
 	shadow: {
@@ -47,9 +47,9 @@ export const SPRITE_CONFIG: Record<SpriteType, SpriteConfig> = {
 		animationHeightPercentage: 20,
 		animations: {
 			faceS: { index: 0, frameCount: 1 },
-			faceW: { index: 1, frameCount: 1 },
-			faceE: { index: 2, frameCount: 1 },
-			faceN: { index: 3, frameCount: 1 },
+			faceE: { index: 1, frameCount: 1 },
+			faceN: { index: 2, frameCount: 1 },
+			faceW: { index: 3, frameCount: 1 },
 		},
 	},
 };

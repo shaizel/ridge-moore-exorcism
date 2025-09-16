@@ -53,6 +53,12 @@ export const PlayerStore = signalStore(
 			// Set the path and mark the player as moving.
 			patchState(store, { path, isMoving: true });
 		},
+
+		setDirection(direction: AnimationName) {
+			patchState(store, () => ({
+				direction: direction,
+			}));
+		},
 		
 		takeStep() {
 			if (!store.isMoving() || store.path().length === 0) {
