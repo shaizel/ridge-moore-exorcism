@@ -8,8 +8,14 @@
 	aspect-ratio: 1.755555555555;
 	max-height: 100%;
 	max-width: 100%;
-	flex-grow: 1;
+	width: 100%;
 	background-repeat: no-repeat;
     background-position: center;
     background-size: contain; 
+	margin: auto;
+
+	@media screen and (min-aspect-ratio: 1.755555555555) {
+		height: 100%;
+		width: auto;
+	}
 }

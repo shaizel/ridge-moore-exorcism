@@ -30,14 +30,14 @@ export class GridPositionDirective {
 	 * Computes the 'left' CSS property in percent.
 	 */
 	public left = computed(
-		() => 11.5 + this.appGridPosition().x * 10 + this.appGridPosition().y * 10 //+ this.offsetX()
+		() => 6 + this.appGridPosition().x * 3.5 + (this.appGridPosition().y * 38) / 11
 	);
 
 	/**
 	 * Computes the 'top' CSS property in percent.
 	 */
 	public top = computed(
-		() => 50 - this.appGridPosition().x * 5 + this.appGridPosition().y * 5 //+ this.offsetY()
+		() => 52 - (this.appGridPosition().x * 29) / 11 + (this.appGridPosition().y * 29) / 11
 	);
 
 	/**
