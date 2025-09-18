@@ -1,21 +1,72 @@
-name: Angular Deploy gh-pages Actions
-# You may pin to the exact commit or the version.
-# uses: AhsanAyaz/angular-deploy-gh-pages-actions@2272ef32f364bc80d8680ee03d8e58f126156c31
-uses: AhsanAyaz/angular-deploy-gh-pages-actions@v1.4.0
-with:
-# Github access token token used to deploy on gh_pages. You can find it on Github.
-github_access_token: 
-# The directory of the angular project, in which all the commands will run
-angular_project_dir: # optional, default is ./
-# Build configuration for the angular app
-build_configuration: # optional, default is production
-# base href for the app
-base_href: # optional, default is /
-# branch on which the angular build will be deployed
-deploy_branch: # optional, default is gh-pages
-# The folder in which `ng build` provides its output. This is the folder which will be deployed to the `deploy_branch`.
-angular_dist_build_folder: # optional, default is dist
-# If the action should run 'ng lint'
-run_lint: # optional
-# Will not fail the step if anything fails
-skip_failure: # optional
+# GitHub Actions workflow to build and deploy an Angular project to GitHub Pages
+
+# Name of the workflow
+name: Build and Deploy Angular to GitHub Pages
+
+on:
+  # Runs on pushes targeting the 'main' branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab on GitHub
+  workflow_dispatch:
+
+# Sets the permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Build job
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build Angular application
+        run: |
+          # The base-href is set dynamically to your repository name for correct routing on GitHub Pages.
+          # The output-path is set to 'dist' to make uploading the artifact straightforward.
+          npx ng build --configuration production --base-href /${{ github.event.repository.name }}/ --output-path dist
+          
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+        
+      - name: Upload build artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload the 'dist' folder which contains the built app
+          path: './dist'
+
+  # Deployment job
+  deploy:
+    # Requires the 'build' job to complete successfully first
+    needs: build
+    
+    # Specifies the deployment environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
