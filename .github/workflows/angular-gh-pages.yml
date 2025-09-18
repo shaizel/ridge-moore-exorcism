@@ -19,4 +19,3 @@ angular_dist_build_folder: # optional, default is dist
 run_lint: # optional
 # Will not fail the step if anything fails
 skip_failure: # optional
-		  
