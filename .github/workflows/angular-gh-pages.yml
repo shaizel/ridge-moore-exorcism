@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload the 'dist' folder which contains the built app
-          path: './dist/ridge-moore-exorcism'
+          path: './dist'
 
   # Deployment job
   deploy:
