@@ -2,10 +2,12 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 
 type GameState = {
     gameSpeedMs: number;
+    vignetteIntensity: number;
 };
 
 const initialState: GameState = {
     gameSpeedMs: 300, // Default game speed
+    vignetteIntensity: 0,
 };
 
 export const GameStore = signalStore(
@@ -19,5 +21,12 @@ export const GameStore = signalStore(
 		setGameSpeed(speed: number): void {
 			patchState(store, { gameSpeedMs: speed });
 		},
+        /**
+         * Sets the intensity of the screen vignette effect.
+         * @param intensity A value from 0 (off) to 1 (full).
+         */
+        setVignetteIntensity(intensity: number): void {
+            patchState(store, { vignetteIntensity: intensity });
+        },
     }))
 );

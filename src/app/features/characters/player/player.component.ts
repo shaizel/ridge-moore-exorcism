@@ -78,6 +78,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
 
 		// Determine volume and game speed based on distance
 		let volume = 0;
+		let vignetteIntensity = 0;
 		let playbackRate = 1.0;
 		let gameSpeed = 300; // Default speed
 		if (minDistance < 4) {
@@ -85,24 +86,28 @@ export class PlayerComponent implements OnInit, OnDestroy {
 				volume = 1.0;
 				gameSpeed = 1200;
 				playbackRate = 2.0;
+				vignetteIntensity = 0.9;
 			} else if (minDistance <= 2) {
 				volume = 0.80;
 				gameSpeed = 1000;
 				playbackRate = 1.8;
+				vignetteIntensity = 0.7;
 			} else if (minDistance <= 3) {
 				volume = 0.5;
 				gameSpeed = 800;
 				playbackRate = 1.4;
+				vignetteIntensity = 0.5;
 			} else if (minDistance <= 4) {
 				volume = 0.3;
 				gameSpeed = 650;
 				playbackRate = 1.2;
+				vignetteIntensity = 0.3;
 			}
 		}
 
 		if (volume > 0 && this.heartbeatSoundId === null) {
 			// Start the sound if it's not already playing
-			this.audioService.startLoopingSound('heartbeat', volume, playbackRate).then(id => this.heartbeatSoundId = id);
+			this.audioService.startLoopingSound('heartbeat', volume, playbackRate).then((id) => this.heartbeatSoundId = id);
 		} else if (volume <= 0 && this.heartbeatSoundId !== null) {
 			// Stop the sound if volume is zero
 			this.audioService.stopLoopingSound(this.heartbeatSoundId);
@@ -114,5 +119,6 @@ export class PlayerComponent implements OnInit, OnDestroy {
 		}
 
 		this.gameStore.setGameSpeed(gameSpeed);
+		this.gameStore.setVignetteIntensity(vignetteIntensity);
 	}
 }

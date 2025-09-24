@@ -17,6 +17,7 @@ import { GameStore } from 'src/app/core/game.store';
 	host: {
 		'[style.background-image]': 'backgroundImage()',
 		'[style.--transition-duration]': 'gameStore.gameSpeedMs() + "ms"',
+		'[style.--vignette-intensity]': 'gameStore.vignetteIntensity()',
 	}
 })
 export class RoomComponent {
