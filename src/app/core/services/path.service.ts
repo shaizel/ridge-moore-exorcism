@@ -3,10 +3,12 @@ import { Position } from '../../features/characters/player/player.store';
 import { RoomObject, RoomStore } from '../../features/room/room.store';
 import { GRID_CELL_BLOCKED as BLOCKED_GRID_CELL, GRID_HEIGHT, GRID_WIDTH } from './constants';
 import { Grid } from '../interfaces/inerfaces';
+import { Npc, NpcStore } from 'src/app/features/characters/npc/npc.store';
 
 @Injectable({providedIn: 'root'})
 export class PathService {
 	private roomStore = inject(RoomStore);
+	private npcStore = inject(NpcStore);
 
 	constructor() { }
 
@@ -62,10 +64,19 @@ export class PathService {
 	private initializeGrid(): Grid {
 		const grid: Grid = Array.from({ length: GRID_WIDTH }, () => Array(GRID_HEIGHT).fill(Infinity));
 		const objects: RoomObject[] = this.roomStore.objects();
+		const npcs: Npc[] = this.npcStore.npcs();
 
+		// Block cells for solid room objects
 		for (const object of objects) {
 			if (object.isSolid && !this.isOutOfBounds(object.position)) {
 				grid[object.position.x][object.position.y] = BLOCKED_GRID_CELL;
+			}
+		}
+
+		// Block cells for solid NPCs
+		for (const npc of npcs) {
+			if (!this.isOutOfBounds(npc.position)) {
+				grid[npc.position.x][npc.position.y] = BLOCKED_GRID_CELL;
 			}
 		}
 
