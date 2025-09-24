@@ -15,12 +15,15 @@ const SOUND_ASSETS = {
 	],
 	'scuttling': [
 		'assets/audio/scuttling_1.mp3'
-	]
+	],
+
+	// Misc.
+	'heartbeat': 'assets/audio/heartbeat.mp3'
 };
 
 // Interface for managing emitters
 interface Emitter {
-	id: string;
+	id: number;
 	source: AudioBufferSourceNode;
 	panner: PannerNode;
 	buffer: AudioBuffer;
@@ -29,10 +32,12 @@ interface Emitter {
 @Injectable({providedIn: 'root'})
 export class AudioService implements OnDestroy {
 	private audioContext: AudioContext;
-	private emitters: { [id: string]: Emitter } = {};
+	private emitters: { [id: number]: Emitter } = {};
 	private audioBuffers: { [name: string]: AudioBuffer[] } = {};
+	private loopingSounds: { [id: number]: { source: AudioBufferSourceNode, gainNode: GainNode } } = {};
 	private ambientSource?: AudioBufferSourceNode;
 	private preloadPromise: Promise<void>;
+	private nextId = 0;
 
 	constructor() {
 		this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -79,6 +84,66 @@ export class AudioService implements OnDestroy {
 
 	ngOnDestroy(): void {
 		this.audioContext.close();
+		Object.keys(this.loopingSounds).forEach((id) => this.stopLoopingSound(+id));
+	}
+
+	// --- Looping Sounds with Volume Control ---
+
+	/**
+	 * Starts a new looping sound and returns a unique ID for it.
+	 * @param soundName The name of the sound to play.
+	 * @param volume The initial volume (0.0 to 1.0).
+	 * @param playbackRate The initial playback rate (1.0 is normal speed).
+	 * @returns A unique number ID for the new sound instance.
+	 */
+	public async startLoopingSound(soundName: keyof typeof SOUND_ASSETS, volume: number, playbackRate = 1.0): Promise<number> {
+		await this.preloadPromise;
+		const id = this.nextId++;
+
+		const audioBuffer = this.getRandomBuffer(soundName);
+		if (!audioBuffer) {
+			// Return a non-functional ID if sound can't be played
+			return -1;
+		}
+
+		const source = this.audioContext.createBufferSource();
+		const gainNode = this.audioContext.createGain();
+
+		source.buffer = audioBuffer;
+		source.loop = true;
+		source.playbackRate.value = playbackRate;
+		gainNode.gain.value = volume;
+
+		source.connect(gainNode);
+		gainNode.connect(this.audioContext.destination);
+		source.start(0);
+
+		this.loopingSounds[id] = { source, gainNode };
+		return id;
+	}
+
+	public updateLoopingSoundVolume(id: number, volume: number): void {
+		const sound = this.loopingSounds[id];
+		if (sound) {
+			sound.gainNode.gain.setValueAtTime(volume, this.audioContext.currentTime);
+		}
+	}
+
+	public updateLoopingSoundPlaybackRate(id: number, rate: number): void {
+		const sound = this.loopingSounds[id];
+		if (sound) {
+			sound.source.playbackRate.setValueAtTime(rate, this.audioContext.currentTime);
+		}
+	}
+
+	public stopLoopingSound(id: number): void {
+		const sound = this.loopingSounds[id];
+		if (sound) {
+			sound.source.stop();
+			sound.source.disconnect();
+			sound.gainNode.disconnect();
+			delete this.loopingSounds[id];
+		}
 	}
 
 	// --- Ambient Looping Music ---
@@ -167,18 +232,19 @@ export class AudioService implements OnDestroy {
 
 	// --- Sound Emitters ---
 
-	async addEmitter(id: string, soundName: keyof typeof SOUND_ASSETS, x: number, y: number, z: number, loop = false): Promise<void> {
+	async addEmitter(soundName: keyof typeof SOUND_ASSETS, x: number, y: number, z: number, loop = false): Promise<number> {
 		await this.preloadPromise;
+		const id = this.nextId++;
 
 		if (this.emitters[id]) {
 			console.warn(`Emitter with ID '${id}' already exists. Skipping.`);
-			return;
+			// This case should be impossible with internal ID generation, but it's a good safeguard.
+			return id;
 		}
-
 		const audioBuffer = this.getRandomBuffer(soundName);
 		if (!audioBuffer) {
 			// Error is already logged by getRandomBuffer
-			return;
+			return -1;
 		}
 
 		// Create the nodes
@@ -201,10 +267,11 @@ export class AudioService implements OnDestroy {
 		// Store the emitter
 		this.emitters[id] = { id, source, panner, buffer: audioBuffer };
 		console.log(`Emitter '${id}' added and playing sound '${soundName}' at position (${x}, ${y}, ${z}).`);
+		return id;
 	}
 
-	updateEmitterPosition(idOrPanner: string | PannerNode, x: number, y: number, z: number): void {
-		const panner = typeof idOrPanner === 'string' ? this.emitters[idOrPanner]?.panner : idOrPanner;
+	updateEmitterPosition(idOrPanner: number | PannerNode, x: number, y: number, z: number): void {
+		const panner = typeof idOrPanner === 'number' ? this.emitters[idOrPanner]?.panner : idOrPanner;
 		if (!panner) {
 			console.warn(`Panner not found for emitter '${idOrPanner}'.`);
 			return;
@@ -216,7 +283,7 @@ export class AudioService implements OnDestroy {
 		panner.positionZ.setValueAtTime(z, currentTime);
 	}
 
-	removeEmitter(id: string): void {
+	removeEmitter(id: number): void {
 		const emitter = this.emitters[id];
 		if (!emitter) {
 			console.warn(`Emitter with ID '${id}' not found.`);

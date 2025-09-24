@@ -2,9 +2,13 @@
 	<app-player [appGridPosition]="playerStore.position()" [offsetX]="0" [offsetY]="-10" />
 
 	@for (object of roomStore.objects(); track object.id) {
-		<img class="object" [src]="object.sprite" [appGridPosition]="object.position" [offsetX]="62" [offsetY]="50" />
+		<img class="object" [src]="object.sprite" [appGridPosition]="object.position" [offsetX]="0" [offsetY]="-5" />
 	}
 
-	<!-- <app-ghost [appGridPosition]="{x: 9, y: 7}" [offsetX]="0" [offsetY]="-10" /> -->
-	<!-- <app-shadow [appGridPosition]="{x: 5, y: 3}" [offsetX]="0" [offsetY]="-10" /> -->
+	@for (npc of npcStore.npcs(); track npc.id) {
+		<app-npc [npc]="npc"
+			[appGridPosition]="npc.position" 
+            [offsetX]="0" 
+            [offsetY]="-5" />
+	}
 </app-room> 

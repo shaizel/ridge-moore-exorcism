@@ -1,9 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, effect, inject, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SpriteComponent } from "../../../shared/sprite/sprite.component";
 import { PlayerStore, Position } from './player.store';
 import { GridStore } from '../../room/floor-grid/grid.store';
-import { PathService } from 'src/app/core/services/path.service';
+import { PathService } from '../../../core/services/path.service';
+import { GameLoopService } from 'src/app/core/services/game-loop.service';
+import { NpcStore } from '../npc/npc.store';
+import { GameStore } from 'src/app/core/game.store';
+import { AudioService } from 'src/app/core/services/audio.service';
 
 @Component({
 	selector: 'app-player',
@@ -17,28 +22,34 @@ import { PathService } from 'src/app/core/services/path.service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlayerComponent implements OnInit, OnDestroy {
-	private sprite = viewChild.required(SpriteComponent);
-
 	private playerStore = inject(PlayerStore);
 	private gridStore = inject(GridStore);
 	private pathService = inject(PathService);
-
+	private gameLoop = inject(GameLoopService);
+	private npcStore = inject(NpcStore);
+	private gameStore = inject(GameStore);
+	private audioService = inject(AudioService);
 
 	public position = this.playerStore.position;
 	public animation = this.playerStore.direction; // The animation should follow the store's direction 
 	public isMoving = this.playerStore.isMoving;
 
-	private movementInterval?: ReturnType<typeof setInterval>;
-	private readonly MOVEMENT_SPEED_MS = 300; // Move one square every 300ms
+	private heartbeatSoundId: number | null = null;
 
 	constructor() {
-		// Effect to start/stop the movement loop based on the store's isMoving flag
-		effect(() => {
+		// The game loop runs independently. We just listen for ticks.
+		this.gameLoop.tickObservable.pipe(takeUntilDestroyed()).subscribe(() => {
 			if (this.isMoving()) {
-				this.startMovementLoop();
-			} else {
-				this.stopMovementLoop();
-				this.gridStore.setScoredGrid(this.pathService.getScoredGrid(this.playerStore.position()))
+				this.playerStore.takeStep();
+			}
+			// Always check proximity on every tick.
+			this.checkProximityToNpcs();
+		});
+
+		// Effect to clean up grid state when movement stops.
+		effect(() => {
+			if (!this.isMoving()) {
+				this.gridStore.setScoredGrid(this.pathService.getScoredGrid(this.playerStore.position()));
 				this.gridStore.setPath([]);
 				this.gridStore.setSelectedPosition(null);
 			}
@@ -48,28 +59,60 @@ export class PlayerComponent implements OnInit, OnDestroy {
 	ngOnInit() { }
 
 	public ngOnDestroy(): void {
-		this.stopMovementLoop();
-	}
-
-	// This would be called by a map service when the user clicks a tile
-	public moveToDestination(destination: Position): void {
-		// In a real implementation, you would inject a pathfinding service
-		// const path = this.pathfindingService.findPath(this.playerStore.position(), destination);
-		const path: Position[] = [{ x: 6, y: 5 }, { x: 7, y: 5 }, { x: 7, y: 6 }]; // Example path
-		this.playerStore.setPath(path);
-	}
-
-	private startMovementLoop(): void {
-		if (this.movementInterval) {
-			return; // Loop already running
+		if (this.heartbeatSoundId !== null) {
+			this.audioService.stopLoopingSound(this.heartbeatSoundId);
 		}
-		this.movementInterval = setInterval(() => { 
-			this.playerStore.takeStep();
-		}, this.MOVEMENT_SPEED_MS);
 	}
 
-	private stopMovementLoop(): void {
-		clearInterval(this.movementInterval);
-		this.movementInterval = undefined;
+	private checkProximityToNpcs(): void {
+		const playerPos = this.playerStore.position();
+		const npcs = this.npcStore.npcs();
+		let minDistance = Infinity;
+
+		for (const npc of npcs) {
+			const distance = Math.sqrt(Math.pow(playerPos.x - npc.position.x, 2) + Math.pow(playerPos.y - npc.position.y, 2));
+			if (distance < minDistance) {
+				minDistance = distance;
+			}
+		}
+
+		// Determine volume and game speed based on distance
+		let volume = 0;
+		let playbackRate = 1.0;
+		let gameSpeed = 300; // Default speed
+		if (minDistance < 4) {
+			if (minDistance <= 1) {
+				volume = 1.0;
+				gameSpeed = 1200;
+				playbackRate = 2.0;
+			} else if (minDistance <= 2) {
+				volume = 0.80;
+				gameSpeed = 1000;
+				playbackRate = 1.8;
+			} else if (minDistance <= 3) {
+				volume = 0.5;
+				gameSpeed = 800;
+				playbackRate = 1.4;
+			} else if (minDistance <= 4) {
+				volume = 0.3;
+				gameSpeed = 650;
+				playbackRate = 1.2;
+			}
+		}
+
+		if (volume > 0 && this.heartbeatSoundId === null) {
+			// Start the sound if it's not already playing
+			this.audioService.startLoopingSound('heartbeat', volume, playbackRate).then(id => this.heartbeatSoundId = id);
+		} else if (volume <= 0 && this.heartbeatSoundId !== null) {
+			// Stop the sound if volume is zero
+			this.audioService.stopLoopingSound(this.heartbeatSoundId);
+			this.heartbeatSoundId = null;
+		} else if (this.heartbeatSoundId !== null) {
+			// Otherwise, just update the volume
+			this.audioService.updateLoopingSoundVolume(this.heartbeatSoundId, volume);
+			this.audioService.updateLoopingSoundPlaybackRate(this.heartbeatSoundId, playbackRate);
+		}
+
+		this.gameStore.setGameSpeed(gameSpeed);
 	}
 }

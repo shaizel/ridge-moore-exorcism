@@ -24,66 +24,54 @@ const initialState: PlayerState = {
 export const PlayerStore = signalStore(
 	{ providedIn: 'root' },
 	withState(initialState),
-	withMethods((store) => ({
-		setPosition(position: Position) {
-			patchState(store, { position });
-		},
+	withMethods((store) => {
+		function getDirectionForMove(current: Position, next: Position): AnimationName {
+			const dx = next.x - current.x;
+			const dy = next.y - current.y;
 
-		move(dx: number, dy: number) {
-			let newDirection = store.direction();
-			if (dx > 0) newDirection = 'faceE';
-			if (dx < 0) newDirection = 'faceW'; 
-			if (dy > 0) newDirection = 'faceS';
-			if (dy < 0) newDirection = 'faceN';
+			if (dx > 0) return 'faceE';
+			if (dx < 0) return 'faceW';
+			if (dy > 0) return 'faceS';
+			if (dy < 0) return 'faceN';
 
-			patchState(store, (state) => ({
-				position: {
-					x: state.position.x + dx,
-					y: state.position.y + dy,
-				},
-				direction: newDirection,
-			}));
-		},
+			return store.direction();
+		}
 
-		setPath(path: Position[]) {
-			// Don't accept a new path if already moving
-			if (store.isMoving()) {
-				return;
-			}
-			// Set the path and mark the player as moving.
-			patchState(store, { path, isMoving: true });
-		},
+		return {
+			setPosition(position: Position) {
+				patchState(store, { position });
+			},
 
-		setDirection(direction: AnimationName) {
-			patchState(store, () => ({
-				direction: direction,
-			}));
-		},
-		
-		takeStep() {
-			if (!store.isMoving() || store.path().length === 0) {
-				patchState(store, { isMoving: false });
-				return;
-			}
+			setPath(path: Position[]) {
+				// Don't accept a new path if already moving
+				if (store.isMoving()) {
+					return;
+				}
+				// Set the path and mark the player as moving.
+				patchState(store, { path, isMoving: true });
+			},
 
-			const currentPosition = store.position();
-			const nextPosition = store.path()[0];
+			setDirection(direction: AnimationName) {
+				patchState(store, { direction });
+			},
 
-			const dx = nextPosition.x - currentPosition.x;
-			const dy = nextPosition.y - currentPosition.y;
+			takeStep() {
+				if (!store.isMoving() || store.path().length === 0) {
+					patchState(store, { isMoving: false });
+					return;
+				}
 
-			let newDirection = store.direction();
-			if (dx > 0) newDirection = 'faceE';
-			if (dx < 0) newDirection = 'faceW';
-			if (dy > 0) newDirection = 'faceS';
-			if (dy < 0) newDirection = 'faceN';
+				const currentPosition = store.position();
+				const nextPosition = store.path()[0];
+				const newDirection = getDirectionForMove(currentPosition, nextPosition);
 
-			// Remove the step we just took from the path
-			patchState(store, (state) => ({
-				position: nextPosition,
-				direction: newDirection,
-				path: state.path.slice(1),
-			}));
-		},
-	}))
+				// Remove the step we just took from the path
+				patchState(store, (state) => ({
+					position: nextPosition,
+					direction: newDirection,
+					path: state.path.slice(1),
+				}));
+			},
+		};
+	})
 );

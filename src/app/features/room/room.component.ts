@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { ROOM_CONFIG, RoomType } from './room-types';
 import { FloorGridComponent } from "./floor-grid/floor-grid.component";
+import { GameStore } from 'src/app/core/game.store';
 
 @Component({
 	selector: 'app-room',
@@ -15,12 +16,12 @@ import { FloorGridComponent } from "./floor-grid/floor-grid.component";
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	host: {
 		'[style.background-image]': 'backgroundImage()',
+		'[style.--transition-duration]': 'gameStore.gameSpeedMs() + "ms"',
 	}
 })
 export class RoomComponent {
-	/**
-	 * The type of room to display. This is a required input.
-	 */
+	public gameStore = inject(GameStore);
+	
 	public roomType = input.required<RoomType>();
 
 	/** A computed signal to get the room's configuration data based on its type. */
