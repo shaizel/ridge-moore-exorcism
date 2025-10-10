@@ -29,14 +29,20 @@ interface Emitter {
 	buffer: AudioBuffer;
 }
 
+interface AmbientSource extends AudioBufferSourceNode {
+	gainNode: GainNode;
+}
+
 @Injectable({providedIn: 'root'})
 export class AudioService implements OnDestroy {
 	private audioContext: AudioContext;
 	private emitters: { [id: number]: Emitter } = {};
 	private audioBuffers: { [name: string]: AudioBuffer[] } = {};
 	private loopingSounds: { [id: number]: { source: AudioBufferSourceNode, gainNode: GainNode } } = {};
-	private ambientSource?: AudioBufferSourceNode;
+	private ambientSourceWithGain?: AmbientSource;
 	private preloadPromise: Promise<void>;
+	private duckingCounter = 0;
+	private readonly duckingConfig = { volume: 0.3, fadeDuration: 1 }; // Duck to 50% over 0.5 seconds
 	private nextId = 0;
 
 	constructor() {
@@ -83,8 +89,32 @@ export class AudioService implements OnDestroy {
 	}
 
 	ngOnDestroy(): void {
+		this.stopAllSounds();
 		this.audioContext.close();
-		Object.keys(this.loopingSounds).forEach((id) => this.stopLoopingSound(+id));
+	}
+
+	private duckAmbientMusic(): void {
+		this.duckingCounter++;
+		// If this is the first sound to start, duck the ambient music.
+		if (this.duckingCounter === 1 && this.ambientSourceWithGain?.gainNode) {
+			const gain = this.ambientSourceWithGain.gainNode.gain;
+			// Set the starting point for the ramp to the current value to ensure a smooth transition.
+			gain.setValueAtTime(gain.value, this.audioContext.currentTime);
+			gain.linearRampToValueAtTime(this.duckingConfig.volume, this.audioContext.currentTime + this.duckingConfig.fadeDuration);
+		}
+	}
+
+	private unDuckAmbientMusic(): void {
+		if (this.duckingCounter > 0) {
+			this.duckingCounter--;
+			// If this was the last sound, restore the ambient volume.
+			if (this.duckingCounter === 0 && this.ambientSourceWithGain?.gainNode) {
+				const gain = this.ambientSourceWithGain.gainNode.gain;
+				// Set the starting point for the ramp to the current value.
+				gain.setValueAtTime(gain.value, this.audioContext.currentTime);
+				gain.linearRampToValueAtTime(1.0, this.audioContext.currentTime + this.duckingConfig.fadeDuration);
+			}
+		}
 	}
 
 	// --- Looping Sounds with Volume Control ---
@@ -98,6 +128,7 @@ export class AudioService implements OnDestroy {
 	 */
 	public async startLoopingSound(soundName: keyof typeof SOUND_ASSETS, volume: number, playbackRate = 1.0): Promise<number> {
 		await this.preloadPromise;
+		this.duckAmbientMusic();
 		const id = this.nextId++;
 
 		const audioBuffer = this.getRandomBuffer(soundName);
@@ -138,6 +169,7 @@ export class AudioService implements OnDestroy {
 
 	public stopLoopingSound(id: number): void {
 		const sound = this.loopingSounds[id];
+		this.unDuckAmbientMusic();
 		if (sound) {
 			sound.source.stop();
 			sound.source.disconnect();
@@ -146,12 +178,18 @@ export class AudioService implements OnDestroy {
 		}
 	}
 
+	public stopAllSounds(): void {
+		this.stopAmbientMusic();
+		Object.keys(this.loopingSounds).forEach((id) => this.stopLoopingSound(+id));
+	}
+
+
 	// --- Ambient Looping Music ---
 
 	async playAmbientMusic(): Promise<void> {
 		await this.preloadPromise;
 
-		if (this.ambientSource) {
+		if (this.ambientSourceWithGain) {
 			// Ambient music is already playing
 			return;
 		}
@@ -162,18 +200,22 @@ export class AudioService implements OnDestroy {
 			return;
 		}
 
-		this.ambientSource = this.audioContext.createBufferSource();
-		this.ambientSource.buffer = ambientBuffer;
-		this.ambientSource.loop = true;
-		this.ambientSource.connect(this.audioContext.destination);
-		this.ambientSource.start(0);
+		const source = this.audioContext.createBufferSource();
+		const gainNode = this.audioContext.createGain();
+		source.buffer = ambientBuffer;
+		source.loop = true;
+		source.connect(gainNode);
+		gainNode.connect(this.audioContext.destination);
+
+		this.ambientSourceWithGain = Object.assign(source, { gainNode });
+		this.ambientSourceWithGain.start(0);
 		console.log('Ambient music started.');
 	}
 
 	stopAmbientMusic(): void {
-		if (this.ambientSource) {
-			this.ambientSource.stop();
-			this.ambientSource = undefined;
+		if (this.ambientSourceWithGain) {
+			this.ambientSourceWithGain.stop();
+			this.ambientSourceWithGain = undefined;
 			console.log('Ambient music stopped.');
 		}
 	}
@@ -234,6 +276,7 @@ export class AudioService implements OnDestroy {
 
 	async addEmitter(soundName: keyof typeof SOUND_ASSETS, x: number, y: number, z: number, loop = false): Promise<number> {
 		await this.preloadPromise;
+		this.duckAmbientMusic();
 		const id = this.nextId++;
 
 		if (this.emitters[id]) {
@@ -264,6 +307,13 @@ export class AudioService implements OnDestroy {
 		source.connect(panner);
 		panner.connect(this.audioContext.destination);
 
+		// If not looping, it's a one-shot emitter, so we need to unduck when it ends.
+		if (!loop) {
+			source.onended = () => {
+				this.unDuckAmbientMusic();
+			};
+		}
+
 		// Store the emitter
 		this.emitters[id] = { id, source, panner, buffer: audioBuffer };
 		console.log(`Emitter '${id}' added and playing sound '${soundName}' at position (${x}, ${y}, ${z}).`);
@@ -290,6 +340,7 @@ export class AudioService implements OnDestroy {
 			return;
 		}
 
+		this.unDuckAmbientMusic();
 		emitter.source.stop();
 		emitter.source.disconnect();
 		emitter.panner.disconnect();
@@ -300,6 +351,7 @@ export class AudioService implements OnDestroy {
 	// A method to play a one-shot sound without managing a long-term emitter
 	async playOneShotSound(soundName: keyof typeof SOUND_ASSETS, x: number, y: number, z: number): Promise<void> {
 		await this.preloadPromise;
+		this.duckAmbientMusic();
 
 		const audioBuffer = this.getRandomBuffer(soundName);
 		if (!audioBuffer) {
@@ -322,6 +374,7 @@ export class AudioService implements OnDestroy {
 		source.onended = () => {
 			source.disconnect();
 			panner.disconnect();
+			this.unDuckAmbientMusic();
 		};
 	}
 }

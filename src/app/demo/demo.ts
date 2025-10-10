@@ -56,7 +56,7 @@ export class Demo {
 	}
 
 	ngOnDestroy() {
-		this.audioService.stopAmbientMusic();
+		this.audioService.stopAllSounds();
 	}
 
 	// This would be called when the player moves to a new area.
