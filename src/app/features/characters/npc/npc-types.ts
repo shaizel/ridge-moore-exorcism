@@ -11,7 +11,7 @@ export interface NpcConfig {
 
 export const NPC_CONFIG: Record<string, NpcConfig> = {
 	ghost: (() => {
-		const initialTickCount = 2;
+		const initialTickCount = 1;
 		let tickCount = initialTickCount;
 		return {
 			spriteType: 'ghost',
