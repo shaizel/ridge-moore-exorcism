@@ -28,12 +28,12 @@
         @for $i from 1 through 10 {
             &:nth-child(#{$i}) {
                 z-index: 10 - $i;
-                translate: 100% * ($i + 0.8);
+                translate: 100% * ($i - 0.5);
             }
         }
 
         &:first-child {
-            translate: 100%;
+            translate: 0;
         }
     }
 }

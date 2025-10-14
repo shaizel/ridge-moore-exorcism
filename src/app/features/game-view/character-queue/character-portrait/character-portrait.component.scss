@@ -1,13 +1,13 @@
 :host {
     display: block;
-    width: 10vh;
+    width: 9vh;
     overflow: hidden;
     transition: width 0.3s ease-in-out, border-color 0.3s ease-in-out, rotate 0.3s ease-in, translate 0.3s ease-in-out;
 	position: relative;
 
     &.active {
         margin-left: 0;
-        width: 15vh;
+        width: 14vh;
     }
 
 	.background {
