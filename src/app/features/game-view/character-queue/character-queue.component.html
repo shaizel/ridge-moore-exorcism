@@ -1,0 +1,6 @@
+@for (character of characterQueue(); track character.id) {
+    <app-character-portrait 
+        [entry]="character"
+        [class.active]="character === activeCharacter()" 
+    />
+}

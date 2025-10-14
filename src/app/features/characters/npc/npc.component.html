@@ -1,1 +1,5 @@
+@if (characterQueueStore.activeCharacter().id === npc().id) {
+    <div class="marker"></div>
+}
+
 <app-sprite [spriteType]="spriteType()" [animationName]="npc().direction" />

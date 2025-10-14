@@ -1,7 +1,6 @@
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { Position } from '../player/player.store';
-
-export type NpcType = 'ghost' | 'shadow';
+import { NpcType } from './npc-types';
 
 export interface Npc {
     id: number;
@@ -25,6 +24,5 @@ export const NpcStore = signalStore(
         loadNpcs(npcs: Npc[]) {
             patchState(store, { npcs });
         },
-        // In the future, you can add methods to move NPCs, update health, etc.
     }))
 );

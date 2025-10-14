@@ -1,6 +1,9 @@
 // player.store.ts
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { AnimationName } from '../../../shared/sprite/sprite-types';
+import { CharacterQueueStore } from '../../game-view/character-queue/character-queue.store';
+import { AudioService } from 'src/app/core/services/audio.service';
+import { inject } from '@angular/core';
 
 export interface Position {
 	x: number;
@@ -24,7 +27,11 @@ const initialState: PlayerState = {
 export const PlayerStore = signalStore(
 	{ providedIn: 'root' },
 	withState(initialState),
-	withMethods((store) => {
+	withMethods((
+		store,
+		characterQueueStore = inject(CharacterQueueStore),
+		audioService = inject(AudioService),
+	) => {
 		function getDirectionForMove(current: Position, next: Position): AnimationName {
 			const dx = next.x - current.x;
 			const dy = next.y - current.y;
@@ -58,6 +65,7 @@ export const PlayerStore = signalStore(
 			takeStep() {
 				if (!store.isMoving() || store.path().length === 0) {
 					patchState(store, { isMoving: false });
+					characterQueueStore.nextTurn();
 					return;
 				}
 
@@ -71,6 +79,23 @@ export const PlayerStore = signalStore(
 					direction: newDirection,
 					path: state.path.slice(1),
 				}));
+
+				// Update the audio listener's position and orientation
+				audioService.setListenerPosition(nextPosition.x, nextPosition.y);
+				switch (newDirection) {
+					case 'faceN':
+						audioService.setListenerRotation(0, -1);
+						break;
+					case 'faceS':
+						audioService.setListenerRotation(0, 1);
+						break;
+					case 'faceW':
+						audioService.setListenerRotation(-1, 0);
+						break;
+					case 'faceE':
+						audioService.setListenerRotation(1, 0);
+						break;
+				}
 			},
 		};
 	})

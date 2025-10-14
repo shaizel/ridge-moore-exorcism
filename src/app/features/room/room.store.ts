@@ -1,5 +1,6 @@
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { Position } from '../characters/player/player.store';
+import { RoomType } from './room-types';
 
 //#region Interfaces
 
@@ -18,6 +19,7 @@ type RoomState = {
 	name: string;
 	backgroundImage: string;
 	objects: RoomObject[];
+	type: RoomType;
 }
 
 //#endregion
@@ -36,7 +38,8 @@ const initialState: RoomState = {
 	id: NaN,
 	name: '',
 	backgroundImage: '',
-	objects: []
+	objects: [],
+	type: 'brick_wall', // Default value
 };
 
 export const RoomStore = signalStore( 
@@ -52,4 +55,3 @@ export const RoomStore = signalStore(
 		}
     }))
 );
-

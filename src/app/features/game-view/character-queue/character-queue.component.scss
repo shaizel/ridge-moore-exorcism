@@ -1,0 +1,39 @@
+@use 'sass:list';
+
+:host {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    gap: 10px; /* Space between portraits */
+    z-index: 1000; /* Ensure it's on top of other UI */
+    pointer-events: none; /* Allow clicks to pass through */
+
+    // A predefined list of rotation values for the character portraits.
+    $rotations: -3deg, 4deg, -2deg, 2deg;
+
+    app-character-portrait {
+        position: absolute;
+        bottom: 0;
+    }
+
+    // Apply a rotation to each portrait based on its index.
+    // The pattern repeats every 4 elements.
+    ::ng-deep app-character-portrait {
+        @for $i from 1 through 4 {
+            &:nth-child(4n + #{$i}) {
+                rotate: list.nth($rotations, $i);
+            }
+        }
+
+        @for $i from 1 through 10 {
+            &:nth-child(#{$i}) {
+                z-index: 10 - $i;
+                translate: 100% * ($i + 0.8);
+            }
+        }
+
+        &:first-child {
+            translate: 100%;
+        }
+    }
+}

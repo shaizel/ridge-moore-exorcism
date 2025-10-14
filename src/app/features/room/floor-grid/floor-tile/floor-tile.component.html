@@ -1,3 +1,1 @@
-<div class="tile-container" (click)="tileContainerClickHandler($event)">
-
-</div>
+<div class="tile-container" [class.inactive]="!isPlayerActive()" (click)="tileContainerClickHandler($event)"></div>

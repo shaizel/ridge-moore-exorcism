@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Position } from '../../features/characters/player/player.store';
 import { RoomObject, RoomStore } from '../../features/room/room.store';
-import { GRID_CELL_BLOCKED as BLOCKED_GRID_CELL, GRID_HEIGHT, GRID_WIDTH } from './constants';
+import { GRID_CELL_BLOCKED, GRID_HEIGHT, GRID_WIDTH } from './constants';
 import { Grid } from '../interfaces/inerfaces';
 import { Npc, NpcStore } from 'src/app/features/characters/npc/npc.store';
 
@@ -69,14 +69,14 @@ export class PathService {
 		// Block cells for solid room objects
 		for (const object of objects) {
 			if (object.isSolid && !this.isOutOfBounds(object.position)) {
-				grid[object.position.x][object.position.y] = BLOCKED_GRID_CELL;
+				grid[object.position.x][object.position.y] = GRID_CELL_BLOCKED;
 			}
 		}
 
 		// Block cells for solid NPCs
 		for (const npc of npcs) {
 			if (!this.isOutOfBounds(npc.position)) {
-				grid[npc.position.x][npc.position.y] = BLOCKED_GRID_CELL;
+				grid[npc.position.x][npc.position.y] = GRID_CELL_BLOCKED;
 			}
 		}
 
@@ -102,7 +102,7 @@ export class PathService {
 	}
 
 	private isInvalidPosition(pos: Position, grid: Grid): boolean {
-		return this.isOutOfBounds(pos) || grid[pos.x][pos.y] === BLOCKED_GRID_CELL;
+		return this.isOutOfBounds(pos) || grid[pos.x][pos.y] === GRID_CELL_BLOCKED;
 	}
 
 	private reconstructPath(grid: Grid, destination: Position): Position[] {

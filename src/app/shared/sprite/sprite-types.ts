@@ -1,4 +1,3 @@
-export type SpriteType = "priest" | "ghost" | "shadow";
 export type AnimationName = "faceS" | "faceW" | "faceE" | "faceN";
 
 export interface SpriteConfig {
@@ -15,7 +14,7 @@ export interface SpriteConfig {
 	>;
 }
 
-export const SPRITE_CONFIG: Record<SpriteType, SpriteConfig> = {
+export const SPRITE_CONFIG: Record<string, SpriteConfig> = {
 	priest: {
 		path: "assets/sprites/priest.png",
 		animationCount: 4,
@@ -52,4 +51,6 @@ export const SPRITE_CONFIG: Record<SpriteType, SpriteConfig> = {
 			faceW: { index: 3, frameCount: 1 },
 		},
 	},
-};
+} as const;
+
+export type SpriteType = keyof typeof SPRITE_CONFIG;

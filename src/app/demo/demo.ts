@@ -10,12 +10,15 @@ import { GridPositionDirective } from '../shared/directives/grid-position.direct
 import { Npc, NpcStore } from '../features/characters/npc/npc.store';
 import { GameLoopService } from '../core/services/game-loop.service';
 import { NpcComponent } from '../features/characters/npc/npc.component';
+import { CharacterQueueComponent } from '../features/game-view/character-queue/character-queue.component';
+import { RoomType } from '../features/room/room-types';
 
 export interface RoomDefinition {
 	id: number;
 	name: string;
 	backgroundImage: string;
 	objects: RoomObject[];
+	type: RoomType;
 }
 
 export interface PlayerDefinition {
@@ -32,7 +35,7 @@ export interface Position {
 	standalone: true,
 	templateUrl: './demo.html',
 	styleUrl: './demo.scss',
- 	imports: [RoomComponent, PlayerComponent, GridPositionDirective, NpcComponent],
+ 	imports: [RoomComponent, PlayerComponent, GridPositionDirective, NpcComponent, CharacterQueueComponent],
 })
 export class Demo {
 	private audioService: AudioService = inject(AudioService);
@@ -84,6 +87,7 @@ export class Demo {
 				id: 0,
 				name: 'Demo',
 				backgroundImage: 'assets/rooms/brick-wall.png',
+				type: 'brick_wall',
 				objects: [
 					{ id: 0, type: 'chair', position: { x: 8, y: 10 }, sprite: 'assets/static/chair.png', isSolid: true },
 					{ id: 1, type: 'chair', position: { x: 2, y: 4 }, sprite: 'assets/static/chair.png', isSolid: true },
@@ -95,8 +99,9 @@ export class Demo {
 				position: { x: 0, y: 0 },
 			},
 			npcData: [
-				{ id: 100, type: 'ghost', position: { x: 9, y: 7 }, direction: 'faceS' },
-				{ id: 101, type: 'shadow', position: { x: 5, y: 3 }, direction: 'faceE' },
+				{ id: 100, type: 'shadow', position: { x: 9, y: 7 }, direction: 'faceS' },
+				{ id: 101, type: 'ghost', position: { x: 5, y: 3 }, direction: 'faceE' },
+				{ id: 102, type: 'shadow', position: { x: 7, y: 3 }, direction: 'faceW' },
 			]
 		};
     }

@@ -9,7 +9,14 @@ const SOUND_ASSETS = {
 	],
 
 	// Sound Emitters
-	'ghost': 'assets/audio/ghost.mp3',
+	'shadow': [
+		'assets/audio/whisper_2.mp3',
+		'assets/audio/whisper_3.mp3'
+	],
+	'ghost': [
+		'assets/audio/whisper_1.mp3',
+		'assets/audio/whisper_4.mp3'
+	],
 	'man_scream': [
 		'assets/audio/man_scream_1.mp3' 
 	],
@@ -350,31 +357,48 @@ export class AudioService implements OnDestroy {
 
 	// A method to play a one-shot sound without managing a long-term emitter
 	async playOneShotSound(soundName: keyof typeof SOUND_ASSETS, x: number, y: number, z: number): Promise<void> {
-		await this.preloadPromise;
-		this.duckAmbientMusic();
+		return new Promise(async (resolve) => {
+			const listener = this.audioContext.listener;
+			const dx = x - listener.positionX.value;
+			const dy = y - listener.positionY.value;
+			const distance = Math.sqrt(dx * dx + dy * dy);
 
-		const audioBuffer = this.getRandomBuffer(soundName);
-		if (!audioBuffer) {
-			// Error is already logged by getRandomBuffer
-			return;
-		}
+			await this.preloadPromise;
+			this.duckAmbientMusic();
 
-		const source = this.audioContext.createBufferSource();
-		const panner = this.audioContext.createPanner();
+			const audioBuffer = this.getRandomBuffer(soundName);
+			if (!audioBuffer) {
+				// Error is already logged by getRandomBuffer
+				this.unDuckAmbientMusic();
+				resolve();
+				return;
+			}
 
-		source.buffer = audioBuffer;
-		source.connect(panner);
-		panner.connect(this.audioContext.destination);
+			const source = this.audioContext.createBufferSource();
+			const panner = this.audioContext.createPanner();
+			const gainNode = this.audioContext.createGain();
 
-		// Set position and play
-		this.updateEmitterPosition(panner, x, y, z);
-		source.start(0);
+			// Set volume based on distance. This is in addition to the panner's natural attenuation.
+			const volume = Math.max(0, 1 - distance / 30); // Example: full volume up to distance 0, silent at distance 10
+			gainNode.gain.value = volume;
 
-		// Clean up the nodes after the sound finishes
-		source.onended = () => {
-			source.disconnect();
-			panner.disconnect();
-			this.unDuckAmbientMusic();
-		};
+			source.buffer = audioBuffer;
+			source.connect(gainNode);
+			gainNode.connect(panner);
+			panner.connect(this.audioContext.destination);
+
+			// Set position and play
+			this.updateEmitterPosition(panner, x, y, z);
+			source.start(0);
+
+			// Clean up the nodes and resolve the promise after the sound finishes
+			source.onended = () => {
+				source.disconnect();
+				panner.disconnect();
+				gainNode.disconnect();
+				this.unDuckAmbientMusic();
+				resolve();
+			};
+		});
 	}
 }
