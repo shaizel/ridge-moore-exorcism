@@ -84,22 +84,22 @@ export class PlayerComponent implements OnInit, OnDestroy {
 		if (minDistance < 4) {
 			if (minDistance <= 1) {
 				volume = 1.0;
-				gameSpeed = 1200;
+				gameSpeed = 800;
 				playbackRate = 2.0;
 				vignetteIntensity = 0.9;
 			} else if (minDistance <= 2) {
 				volume = 0.80;
-				gameSpeed = 1000;
+				gameSpeed = 700;
 				playbackRate = 1.8;
 				vignetteIntensity = 0.7;
 			} else if (minDistance <= 3) {
 				volume = 0.5;
-				gameSpeed = 800;
+				gameSpeed = 600;
 				playbackRate = 1.4;
 				vignetteIntensity = 0.5;
 			} else if (minDistance <= 4) {
 				volume = 0.3;
-				gameSpeed = 650;
+				gameSpeed = 450;
 				playbackRate = 1.2;
 				vignetteIntensity = 0.3;
 			}
