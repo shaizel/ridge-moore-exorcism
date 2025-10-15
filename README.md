@@ -2,6 +2,10 @@
 
 A 2D top-down horror game built with Angular.
 
+## Live Demo
+
+You can play the game live at [https://shaizel.github.io/ridge-moore-exorcism](https://shaizel.github.io/ridge-moore-exorcism).
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 20.1.4.
 
 ## Development server
