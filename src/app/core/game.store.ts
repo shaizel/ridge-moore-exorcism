@@ -3,11 +3,15 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 type GameState = {
     gameSpeedMs: number;
     vignetteIntensity: number;
+    gameOverLost: boolean;
+    gameOverWon: boolean;
 };
 
 const initialState: GameState = {
     gameSpeedMs: 300, // Default game speed
     vignetteIntensity: 0,
+    gameOverLost: false,
+    gameOverWon: false
 };
 
 export const GameStore = signalStore(
@@ -28,5 +32,17 @@ export const GameStore = signalStore(
         setVignetteIntensity(intensity: number): void {
             patchState(store, { vignetteIntensity: intensity });
         },
+        /**
+         * Finish the game after losing
+         */
+        gameOverLose(): void {
+            patchState(store, { gameOverLost: true });
+        },
+        /**
+         * Finish the game after winning
+         */
+        gameOverWin(): void {
+            patchState(store, { gameOverWon: true });
+        }
     }))
 );

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CharacterPortraitComponent } from './character-portrait/character-portrait.component';
 import { CharacterQueueStore } from './character-queue.store';
+import { MessageStore } from '../message.store';
 
 @Component({
 	selector: 'app-character-queue',
@@ -15,7 +16,8 @@ import { CharacterQueueStore } from './character-queue.store';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CharacterQueueComponent { 
-	private characterQueueStore = inject(CharacterQueueStore);
+	public characterQueueStore = inject(CharacterQueueStore);
+	public messageStore = inject(MessageStore);
 
 	public characterQueue = this.characterQueueStore.characterQueue;
 	public activeCharacter = this.characterQueueStore.activeCharacter;

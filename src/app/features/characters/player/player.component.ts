@@ -49,7 +49,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
 		// Effect to clean up grid state when movement stops.
 		effect(() => {
 			if (!this.isMoving()) {
-				this.gridStore.setScoredGrid(this.pathService.getScoredGrid(this.playerStore.position()));
+				this.gridStore.setScoredGrid(this.pathService.getScoredGrid(this.playerStore.position(), false, 6));
 				this.gridStore.setPath([]);
 				this.gridStore.setSelectedPosition(null);
 			}

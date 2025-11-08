@@ -11,6 +11,16 @@
             [offsetX]="0" 
             [offsetY]="-5" />
 	}
+
+	<app-door-mock side="E" />
 </app-room> 
 
 <app-character-queue />
+
+@if (gameStore.gameOverLost()) {
+	<app-death-screen />
+}
+
+@if (gameStore.gameOverWon()) {
+	<app-win-screen />
+}

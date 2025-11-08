@@ -1,12 +1,10 @@
-export type AnimationName = "faceS" | "faceW" | "faceE" | "faceN";
-
 export interface SpriteConfig {
 	path: string;
 	animationCount: number;
 	maxFrameCount: number;
 	animationHeightPercentage: number;
 	animations: Record<
-		AnimationName,
+		string,
 		{
 			index: number;
 			frameCount: number;
@@ -49,6 +47,18 @@ export const SPRITE_CONFIG: Record<string, SpriteConfig> = {
 			faceE: { index: 1, frameCount: 1 },
 			faceN: { index: 2, frameCount: 1 },
 			faceW: { index: 3, frameCount: 1 },
+		},
+	},
+	doorE: {
+		path: "assets/sprites/doorE.png",
+		animationCount: 2,
+		maxFrameCount: 6,
+		animationHeightPercentage: 20,
+		animations: {
+			closed: { index: 0, frameCount: 1 },
+			open: { index: 1, frameCount: 1 },
+			closing: { index: 0, frameCount: 6 },
+			opening: { index: 1, frameCount: 6 },
 		},
 	},
 } as const;

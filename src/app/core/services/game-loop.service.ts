@@ -4,12 +4,14 @@ import { Subject } from 'rxjs';
 import { CharacterQueueStore, PLAYER } from 'src/app/features/game-view/character-queue/character-queue.store';
 import { PlayerStore } from 'src/app/features/characters/player/player.store';
 import { NpcStore } from 'src/app/features/characters/npc/npc.store';
-import { NPC_CONFIG } from 'src/app/features/characters/npc/npc-types';
+import { NPC_CONFIG, NpcActionServices } from 'src/app/features/characters/npc/npc-types';
 import { AudioService } from './audio.service';
+import { PathService } from './path.service';
 
 @Injectable({ providedIn: 'root' })
 export class GameLoopService implements OnDestroy {
 	private gameStore = inject(GameStore);
+	private playerStore = inject(PlayerStore);
 	private characterQueueStore = inject(CharacterQueueStore);
 	private npcStore = inject(NpcStore);
 	private audioService = inject(AudioService);
@@ -20,6 +22,8 @@ export class GameLoopService implements OnDestroy {
 	private tickSubject = new Subject<void>();
 	public tickObservable = this.tickSubject.asObservable();
 
+	private npcActionServices: NpcActionServices;
+
 	constructor() {
 		// When the game speed changes in the store, restart the loop
 		// to apply the new speed.
@@ -29,6 +33,15 @@ export class GameLoopService implements OnDestroy {
 				this.restart();
 			}
 		});
+
+		this.npcActionServices = {
+			audioService: this.audioService,
+			playerStore: this.playerStore,
+			pathService: inject(PathService),
+			npcStore: this.npcStore,
+			characterQueueStore: this.characterQueueStore,
+			gameStore: this.gameStore
+		};
 	}
 
 	public start(): void {
@@ -53,10 +66,10 @@ export class GameLoopService implements OnDestroy {
 
 	private async tick(): Promise<void> {
 		// Prevent re-entry if the previous tick's async operations are not yet complete.
-		if (this.isTicking) {
-			return;
-		}
-		this.isTicking = true;
+		// if (this.isTicking) {
+		// 	return;
+		// }
+		// this.isTicking = true;
 
 		this.tickSubject.next();
 
@@ -69,13 +82,11 @@ export class GameLoopService implements OnDestroy {
 			// It's an NPC's turn.
 			const npc = this.npcStore.npcs().find((n) => n.id === activeCharacter.id);
 			if (npc) {
-				if (await NPC_CONFIG[npc.type].action(npc, this.audioService)) { // If turn is finished, switch to next character's turn
-					this.characterQueueStore.nextTurn();
-				}
+				NPC_CONFIG[npc.type].action(npc, this.npcActionServices);
 			}
 		}
 
-		this.isTicking = false;
+		// this.isTicking = false;
 	}
 
 	ngOnDestroy(): void {

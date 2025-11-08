@@ -1,6 +1,8 @@
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
 import { Position } from '../player/player.store';
 import { NpcType } from './npc-types';
+import { CharacterQueueStore } from '../../game-view/character-queue/character-queue.store';
+import { inject } from '@angular/core';
 
 export interface Npc {
     id: number;
@@ -20,9 +22,24 @@ const initialState: NpcState = {
 export const NpcStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
-    withMethods((store) => ({
-        loadNpcs(npcs: Npc[]) {
-            patchState(store, { npcs });
-        },
-    }))
+    withMethods((store, characterQueueStore = inject(CharacterQueueStore)) => {
+        return {
+            loadNpcs(npcs: Npc[]) {
+                patchState(store, { npcs });
+                characterQueueStore.initializeQueue(npcs);
+            },
+            moveNpc(id: number, position: Position, direction: string) {
+                patchState(store, (state) => ({
+                    npcs: state.npcs.map((npc) =>
+                        npc.id === id
+                            ? {
+                                ...npc,
+                                position,
+                                direction: direction as Npc['direction'],
+                            } : npc
+                    ),
+                }));
+            }
+        }
+    })
 );

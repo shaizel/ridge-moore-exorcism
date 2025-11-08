@@ -1,6 +1,5 @@
 // player.store.ts
 import { signalStore, withState, withMethods, patchState } from '@ngrx/signals';
-import { AnimationName } from '../../../shared/sprite/sprite-types';
 import { CharacterQueueStore } from '../../game-view/character-queue/character-queue.store';
 import { AudioService } from 'src/app/core/services/audio.service';
 import { inject } from '@angular/core';
@@ -12,7 +11,7 @@ export interface Position {
 
 type PlayerState = {
 	position: Position;
-	direction: AnimationName;
+	direction: string;
 	path: Position[];
 	isMoving: boolean;
 }
@@ -32,7 +31,7 @@ export const PlayerStore = signalStore(
 		characterQueueStore = inject(CharacterQueueStore),
 		audioService = inject(AudioService),
 	) => {
-		function getDirectionForMove(current: Position, next: Position): AnimationName {
+		function getDirectionForMove(current: Position, next: Position): string {
 			const dx = next.x - current.x;
 			const dy = next.y - current.y;
 
@@ -58,14 +57,14 @@ export const PlayerStore = signalStore(
 				patchState(store, { path, isMoving: true });
 			},
 
-			setDirection(direction: AnimationName) {
+			setDirection(direction: string) {
 				patchState(store, { direction });
 			},
 
 			takeStep() {
 				if (!store.isMoving() || store.path().length === 0) {
 					patchState(store, { isMoving: false });
-					characterQueueStore.nextTurn();
+					characterQueueStore.nextCharacter();
 					return;
 				}
 

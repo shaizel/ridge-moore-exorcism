@@ -11,10 +11,12 @@ import { CharacterQueueStore } from '../../game-view/character-queue/character-q
     templateUrl: './npc.component.html',
     styleUrl: './npc.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        'transition-timing-function': ''
+    }
 })
 export class NpcComponent {
     public characterQueueStore = inject(CharacterQueueStore);
-
 
     public npc = input.required<Npc>();
 

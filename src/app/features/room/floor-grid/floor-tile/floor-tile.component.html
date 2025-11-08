@@ -1,1 +1,6 @@
-<div class="tile-container" [class.inactive]="!isPlayerActive()" (click)="tileContainerClickHandler($event)"></div>
+<div class="tile-container" [class.inactive]="!isPlayerActive()" (click)="tileContainerClickHandler($event)">
+    <!-- <div class="tile-debug-data">
+        <div class="tile-position">({{position().x}},{{position().y}})</div>
+        <div class="tile-score">{{gridStore.scoredGrid()?.[this.position().x]?.[this.position().y]}}</div>
+    </div> -->
+</div>

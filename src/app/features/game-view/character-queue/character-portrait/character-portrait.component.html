@@ -1,2 +1,10 @@
-<div class="background" [style.background-image]="backgroundUrl()"></div>
-<img class="portrait" [src]="entry().portrait" />
+<div class="portrait">
+    <div class="background" [style.background-image]="backgroundUrl()"></div>
+    <img class="picture" [src]="entry().portrait" />
+</div>
+
+@if (showMessage()) {
+    <div class="message-bubble" (click)="messageBubbleClickHandler($event)" [ngStyle]="currentMessage().styleObject">
+        {{currentMessage().text}}  
+    </div>
+}

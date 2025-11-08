@@ -2,4 +2,8 @@
     <div class="marker"></div>
 }
 
+@if (npc().type === "shadow") {
+    <div class="shadow-box"></div>
+}
+
 <app-sprite [spriteType]="spriteType()" [animationName]="npc().direction" />

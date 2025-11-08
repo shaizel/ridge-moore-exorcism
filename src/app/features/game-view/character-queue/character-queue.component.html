@@ -4,3 +4,7 @@
         [class.active]="character === activeCharacter()" 
     />
 }
+
+@if (messageStore.messages().length > 0) {
+    <div class="message-bubble-overlay" (click)="messageStore.popMessage()"></div>
+}

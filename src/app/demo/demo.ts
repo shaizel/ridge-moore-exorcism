@@ -12,6 +12,12 @@ import { GameLoopService } from '../core/services/game-loop.service';
 import { NpcComponent } from '../features/characters/npc/npc.component';
 import { CharacterQueueComponent } from '../features/game-view/character-queue/character-queue.component';
 import { RoomType } from '../features/room/room-types';
+import { PLAYER } from '../features/game-view/character-queue/character-queue.store';
+import { MessageStore } from '../features/game-view/message.store';
+import { DeathScreenComponent } from "../features/game-view/death-screen/death-screen.component";
+import { GameStore } from '../core/game.store';
+import { DoorMockComponent } from "../features/room/door-mock/door-mock.component";
+import { WinScreenComponent } from "../features/game-view/win-screen/win-screen.component";
 
 export interface RoomDefinition {
 	id: number;
@@ -19,6 +25,7 @@ export interface RoomDefinition {
 	backgroundImage: string;
 	objects: RoomObject[];
 	type: RoomType;
+	doors: ("N" | "S" | "E" | "W")[]
 }
 
 export interface PlayerDefinition {
@@ -35,7 +42,7 @@ export interface Position {
 	standalone: true,
 	templateUrl: './demo.html',
 	styleUrl: './demo.scss',
- 	imports: [RoomComponent, PlayerComponent, GridPositionDirective, NpcComponent, CharacterQueueComponent],
+ 	imports: [RoomComponent, PlayerComponent, GridPositionDirective, NpcComponent, CharacterQueueComponent, DeathScreenComponent, DoorMockComponent, WinScreenComponent],
 })
 export class Demo {
 	private audioService: AudioService = inject(AudioService);
@@ -43,10 +50,10 @@ export class Demo {
 	public playerStore = inject(PlayerStore);
 	public npcStore = inject(NpcStore);
 	private gridStore = inject(GridStore);
-
 	private pathService = inject(PathService);
 	private gameLoop = inject(GameLoopService);
-
+	private messageStore = inject(MessageStore);
+	public gameStore = inject(GameStore);
 
 	ngOnInit() {
 		this.audioService.playAmbientMusic();
@@ -77,6 +84,38 @@ export class Demo {
         // We can create a dedicated method in the PlayerStore for this.
         this.playerStore.setPosition(playerData.position);
 		this.gridStore.setScoredGrid(this.pathService.getScoredGrid(playerData.position))
+
+		this.messageStore.addMessage({
+			characterId: PLAYER,
+			text: "I've got to get out of here!",
+			styleObject: {
+				justifyContent: "center",
+				alignItems: "center",
+				fontSize: "7vh",
+				textAlign: "center"
+			}
+		});
+		this.messageStore.addMessage({
+			characterId: PLAYER,
+			text: "I have to get to the door before these... THINGS get me!",
+			styleObject: {
+				justifyContent: "center",
+				alignItems: "center",
+				fontSize: "7vh",
+				textAlign: "center"
+			}
+		});
+		this.messageStore.addMessage({
+			characterId: 100,
+			text: "I SEEEEEE YOUUUUUUUUUUU",
+			styleObject: {
+				justifyContent: "center",
+				alignItems: "center",
+				fontSize: "7vh",
+				textAlign: "center"
+			},
+			action: () => this.audioService.playOneShotSound('shadow_i_see_you', this.playerStore.position().x, this.playerStore.position().y, 1.8)
+		});
     }
 
     private fetchLevelData(levelId: number): { roomData: RoomDefinition, playerData: PlayerDefinition, npcData: Npc[] } {
@@ -93,7 +132,8 @@ export class Demo {
 					{ id: 1, type: 'chair', position: { x: 2, y: 4 }, sprite: 'assets/static/chair.png', isSolid: true },
 					{ id: 2, type: 'chair', position: { x: 7, y: 6 }, sprite: 'assets/static/chair.png', isSolid: true },
 					{ id: 3, type: 'chair', position: { x: 9, y: 2 }, sprite: 'assets/static/chair.png', isSolid: true },
-				]
+				],
+				doors: ["E"]
 			},
 			playerData: {
 				position: { x: 0, y: 0 },

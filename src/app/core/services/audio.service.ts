@@ -23,6 +23,8 @@ const SOUND_ASSETS = {
 	'scuttling': [
 		'assets/audio/scuttling_1.mp3'
 	],
+	'shadow_i_see_you': 'assets/audio/whisper_3.mp3',
+	'shadow_zog_zog': 'assets/audio/whisper_2.mp3',
 
 	// Misc.
 	'heartbeat': 'assets/audio/heartbeat.mp3'

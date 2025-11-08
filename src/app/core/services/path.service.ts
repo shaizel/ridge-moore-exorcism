@@ -18,13 +18,8 @@ export class PathService {
 	 * @param maxRange An optional maximum range to calculate scores for. Cells beyond this range will be `Infinity`.
 	 * @returns A 2D array where each cell's value is its distance from the start.
 	 */
-	public getScoredGrid(start: Position, maxRange: number = Infinity): Grid {
-		const grid: Grid = this.initializeGrid();
-
-		if (this.isInvalidPosition(start, grid)) {
-			console.warn('Start position is invalid or an obstacle.');
-			return grid;
-		}
+	public getScoredGrid(start: Position, ignoreObstacles: boolean = false, maxRange: number = Infinity): Grid {
+		const grid: Grid = this.initializeGrid(ignoreObstacles);
 
 		const openSet: Position[] = [start];
 		grid[start.x][start.y] = 0;
@@ -61,14 +56,14 @@ export class PathService {
 		return this.reconstructPath(grid, destination);
 	}
 
-	private initializeGrid(): Grid {
+	private initializeGrid(ignoreObstacles: boolean = false): Grid {
 		const grid: Grid = Array.from({ length: GRID_WIDTH }, () => Array(GRID_HEIGHT).fill(Infinity));
 		const objects: RoomObject[] = this.roomStore.objects();
 		const npcs: Npc[] = this.npcStore.npcs();
 
 		// Block cells for solid room objects
 		for (const object of objects) {
-			if (object.isSolid && !this.isOutOfBounds(object.position)) {
+			if ((!ignoreObstacles && object.isSolid) && !this.isOutOfBounds(object.position)) {
 				grid[object.position.x][object.position.y] = GRID_CELL_BLOCKED;
 			}
 		}

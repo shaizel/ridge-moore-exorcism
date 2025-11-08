@@ -8,6 +8,12 @@ WORKDIR /app
 # Copy the package.json and package-lock.json files
 COPY package.json package-lock.json ./
 
+# Clear node_modules directory
+RUN rm -rf node_modules
+
+# Install Node.js dependencies
+RUN npm install
+
 # Install npm dependencies
 RUN npm ci
 

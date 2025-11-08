@@ -1,6 +1,6 @@
 import { CommonModule, NgStyle } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
-import { AnimationName, SPRITE_CONFIG, SpriteType } from './sprite-types';
+import { SPRITE_CONFIG, SpriteType } from './sprite-types';
 import { FRAMERATE } from '../../core/services/constants';
 
 @Component({
@@ -13,7 +13,7 @@ import { FRAMERATE } from '../../core/services/constants';
 })
 export class SpriteComponent {
 	public spriteType = input.required<SpriteType>();
-	public animationName = input<AnimationName>('faceS');
+	public animationName = input.required<string>();
 
 	private config = computed(() => SPRITE_CONFIG[this.spriteType()]);
 	private animationFrame = signal(0);
@@ -53,6 +53,7 @@ export class SpriteComponent {
 		return {
 			'background-image': `url(${config.path})`,
 			'background-position': `${bgX}% ${bgY}%`,
+			'background-size': `${config.animationCount * 100}% ${config.maxFrameCount * 100}%`,
 		};
 	});
 }

@@ -1,0 +1,28 @@
+:host {
+	display: block;
+    position: absolute;
+    height: 25%;
+    max-width: 25%;
+    max-height: 25%;
+    aspect-ratio: 1; 
+	top: 27.1%;
+    left: 61.9%;
+	pointer-events: none;
+
+	.clickable-area {
+		background: transparent;
+		// border: 2px solid red;
+		cursor: pointer;
+		position: absolute;
+		top: 12%;
+		left: 40%;
+		width: 40%;
+		height: 75%;
+		transform: skewY(23deg);
+		pointer-events: all;
+ 
+		&:hover {
+			background: rgba(255, 255, 255, 0.05);
+		}
+	}
+}
