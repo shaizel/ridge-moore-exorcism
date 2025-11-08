@@ -91,7 +91,7 @@ export class Demo {
 			styleObject: {
 				justifyContent: "center",
 				alignItems: "center",
-				fontSize: "7vh",
+				// fontSize: "7vh",
 				textAlign: "center"
 			}
 		});
@@ -101,7 +101,7 @@ export class Demo {
 			styleObject: {
 				justifyContent: "center",
 				alignItems: "center",
-				fontSize: "7vh",
+				// fontSize: "7vh",
 				textAlign: "center"
 			}
 		});
@@ -111,7 +111,7 @@ export class Demo {
 			styleObject: {
 				justifyContent: "center",
 				alignItems: "center",
-				fontSize: "7vh",
+				// fontSize: "7vh",
 				textAlign: "center"
 			},
 			action: () => this.audioService.playOneShotSound('shadow_i_see_you', this.playerStore.position().x, this.playerStore.position().y, 1.8)

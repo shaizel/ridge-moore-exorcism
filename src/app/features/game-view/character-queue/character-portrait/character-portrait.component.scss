@@ -28,10 +28,10 @@
     }
 
     .message-bubble {
-        width: 80vw;
+        width: 90vw;
         height: 20vh;
         position: absolute;
-        left: 10%;
+        left: 5%;
         bottom: 100%;
         background: white;
         border: 4px solid black;
@@ -41,20 +41,28 @@
         flex-direction: row;
         justify-content: flex-start;
         align-items: flex-start;
-        font-size: 7vh;
+        font-size: 7vw;
         font-family: "Comic Sans MS", cursive;
         pointer-events: all;
+
+        @media screen and (min-aspect-ratio: 1.755555555555) {
+            font-size: 7vh;
+        }
 
         // Create the message bubble's callout arrow
         &::after, &::before {
             content: '';
             position: absolute;
             bottom: -19px;
-            left: 2%;
+            left: 14%;
             transform: translateX(-50%);
             width: 0;
             height: 0;
             border-style: solid;
+
+            @media screen and (min-aspect-ratio: 1.755555555555) {
+                left: 3%;
+            }
         }
 
         &::after {
