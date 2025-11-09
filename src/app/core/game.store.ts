@@ -43,6 +43,12 @@ export const GameStore = signalStore(
          */
         gameOverWin(): void {
             patchState(store, { gameOverWon: true });
-        }
+        },
+        /**
+         * Finish the game after winning
+         */
+        restartGame(): void {
+            patchState(store, { gameOverWon: false, gameOverLost: false});
+        },
     }))
 );

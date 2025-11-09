@@ -71,6 +71,8 @@ export class Demo {
 
 	// This would be called when the player moves to a new area.
     public async enterRoom(levelId: number) {
+		this.gameStore.restartGame();
+
         // Fetch the room data from a source (e.g., an API or a local JSON file)
         const { roomData, playerData, npcData } = this.fetchLevelData(levelId);
 
