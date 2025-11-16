@@ -8,13 +8,8 @@ WORKDIR /app
 # Copy the package.json and package-lock.json files
 COPY package.json package-lock.json ./
 
-# Clear node_modules directory
-RUN rm -rf node_modules
-
-# Install Node.js dependencies
-RUN npm install
-
-# Install npm dependencies
+# Install dependencies using npm ci for a clean, reproducible install from package-lock.json
+# This is faster and more reliable for CI/CD environments.
 RUN npm ci
 
 # Copy the entire project
@@ -28,12 +23,15 @@ RUN npm run build
 # Use a lightweight NGINX image as the web server
 FROM nginx:alpine
 
-# Copy custom NGINX configuration for SPA support
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy our custom non-root Nginx configuration. This replaces the default.
+COPY nginx.conf /etc/nginx/nginx.conf
+# Copy our server block configuration for the SPA.
+COPY nginx-spa.conf /etc/nginx/conf.d/default.conf
 
 # Copy the build output from the builder stage to the NGINX web server directory
 # The 'dist/ridge-moore-exorcism' directory is where Angular places the compiled files
-COPY --from=builder /app/dist/ridge-moore-exorcism /usr/share/nginx/html
+# The source path now includes the 'browser' directory where the build output is located.
+COPY --from=builder /app/dist/ridge-moore-exorcism/browser/ /usr/share/nginx/html/
 
 # Switch to a non-root user for security
 USER nginx

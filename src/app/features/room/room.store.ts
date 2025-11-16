@@ -7,7 +7,7 @@ import { RoomType } from './room-types';
 /** Represents a static object within a room. */
 export interface RoomObject {
 	id: number;
-	type: 'chair' | 'table' | 'plant';
+	type: 'chair' | 'inner-wall';
 	position: Position;
 	sprite: string; // Path to the sprite/image asset
 	isSolid: boolean;

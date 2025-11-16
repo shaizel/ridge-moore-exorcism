@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ridge-moore-exorcism-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ridge-moore-exorcism
+  template:
+    metadata:
+      labels:
+        app: ridge-moore-exorcism
+    spec:
+      containers:
+        - name: ridge-moore-exorcism
+          image: ridge-moore-exorcism:latest
+          # Don't pull from a remote registry
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080 # Same port as in nginx.conf and Dockerfile
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ridge-moore-exorcism-service
+spec:
+  type: NodePort 
+  selector:
+    app: ridge-moore-exorcism
+  ports:
+    - protocol: TCP
+      port: 80 # Port the service will be available on inside the cluster
+      targetPort: 8080 # The port on your container to forward traffic to

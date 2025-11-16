@@ -47,10 +47,17 @@ export const NPC_CONFIG: Record<string, NpcConfig> = {
 					// Find the full path, but only keep the first 3 steps for this turn.
 					path = pathService.findPath(scoredGrid, playerPosition).slice(0, 3);
 					soundPromise = audioService.playOneShotSound('ghost', npc.position.x, npc.position.y, 1.8);
+
+					if (path.length === 0) {
+						await soundPromise.finally(() => {
+							characterQueueStore.nextCharacter(); 
+							path = null;
+						});
+					}
 				}
 
 				// If the path is already 0, don't do anything in this action call
-				if (path.length === 0) {
+				if (!path?.length) {
 					return;
 				}
 
@@ -90,10 +97,17 @@ export const NPC_CONFIG: Record<string, NpcConfig> = {
 					// Find the full path, but only keep the first 2 steps for this turn.
 					path = pathService.findPath(scoredGrid, playerPosition).slice(0, 2);
 					soundPromise = audioService.playOneShotSound('shadow', npc.position.x, npc.position.y, 1.8);
+
+					if (path.length === 0) {
+						await soundPromise.finally(() => {
+							characterQueueStore.nextCharacter(); 
+							path = null;
+						});
+					}
 				}
 
 				// If the path is already 0, don't do anything in this action call
-				if (path.length === 0) {
+				if (!path?.length) {
 					return;
 				}
 
