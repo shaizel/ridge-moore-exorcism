@@ -12,7 +12,7 @@ import { CharacterQueueStore } from '../../game-view/character-queue/character-q
     styleUrl: './npc.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
-        'transition-timing-function': ''
+        '[style.--transition-timing-function]': 'transitionTimingFunction()'
     }
 })
 export class NpcComponent {
@@ -21,4 +21,6 @@ export class NpcComponent {
     public npc = input.required<Npc>();
 
     public spriteType = computed(() => NPC_CONFIG[this.npc().type].spriteType);
+
+    public transitionTimingFunction = computed(() => NPC_CONFIG[this.npc().type].movementStyle);
 }

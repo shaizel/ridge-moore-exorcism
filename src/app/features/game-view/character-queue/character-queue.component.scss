@@ -3,7 +3,7 @@
 :host {
     position: absolute;
     gap: 10px; // Space between portraits
-    z-index: 1000;
+    z-index: 10000;
     pointer-events: none; // Allow clicks to pass through
     inset: 0;
     padding: 20px;

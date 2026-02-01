@@ -9,6 +9,7 @@ import { GameLoopService } from 'src/app/core/services/game-loop.service';
 import { NpcStore } from '../npc/npc.store';
 import { GameStore } from 'src/app/core/game.store';
 import { AudioService } from 'src/app/core/services/audio.service';
+import { CharacterQueueStore, PLAYER } from '../../game-view/character-queue/character-queue.store';
 
 @Component({
 	selector: 'app-player',
@@ -28,6 +29,7 @@ export class PlayerComponent implements OnInit, OnDestroy {
 	private gameLoop = inject(GameLoopService);
 	private npcStore = inject(NpcStore);
 	private gameStore = inject(GameStore);
+	private characterQueueStore = inject(CharacterQueueStore);
 	private audioService = inject(AudioService);
 
 	public position = this.playerStore.position;
@@ -46,22 +48,28 @@ export class PlayerComponent implements OnInit, OnDestroy {
 			this.checkProximityToNpcs();
 		});
 
-		// Effect to clean up grid state when movement stops.
+		// Effect to clean up grid state when player's turn ends
 		effect(() => {
-			if (!this.isMoving()) {
-				this.gridStore.setScoredGrid(this.pathService.getScoredGrid(this.playerStore.position(), false, 6));
-				this.gridStore.setPath([]);
-				this.gridStore.setSelectedPosition(null);
+			if (this.characterQueueStore.playerTurnEnded()) {
+				this.resetGrid();
 			}
 		});
 	}
 
-	ngOnInit() { }
+	ngOnInit() {
+		this.resetGrid();
+	}
 
 	public ngOnDestroy(): void {
 		if (this.heartbeatSoundId !== null) {
 			this.audioService.stopLoopingSound(this.heartbeatSoundId);
 		}
+	}
+
+	private resetGrid() {
+		this.gridStore.setScoredGrid(this.pathService.getScoredGrid(this.playerStore.position(), false, 6));
+		this.gridStore.setPath([]);
+		this.gridStore.setSelectedPosition(null);
 	}
 
 	private checkProximityToNpcs(): void {

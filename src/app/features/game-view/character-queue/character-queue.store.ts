@@ -17,6 +17,7 @@ export const CharacterQueueStore = signalStore(
 	withComputed((store) => ({
 		// A computed signal for the currently active character.
 		activeCharacter: computed(() => store.characterQueue()[0]),
+		playerTurnEnded: computed(() => store.characterQueue()[store.characterQueue().length - 1].id === PLAYER),
 	})),
 	withMethods((store) => {
 		return { 

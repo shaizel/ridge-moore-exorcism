@@ -15,9 +15,13 @@ export interface NpcActionServices {
 	gameStore: InstanceType<typeof GameStore>;
 }
 
+export type CssTimingFunction = 'linear' | 'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'step-start' | 'step-end' | (string & {});
+
 export interface NpcConfig {
 	spriteType: SpriteType;
 	portrait: string;
+	movementStyle: CssTimingFunction;
+
 	// Returns true when turn is completed in the current game-loop tick, otherwise, false
 	action: (npc: Npc, services: NpcActionServices) => void;
 }
@@ -40,12 +44,35 @@ export const NPC_CONFIG: Record<string, NpcConfig> = {
 		return {
 			spriteType: 'ghost',
 			portrait: 'assets/static/ghost portrait.png',
+			movementStyle: 'linear',
 			action: async (npc: Npc, { audioService, playerStore, pathService, npcStore, characterQueueStore, gameStore }: NpcActionServices) => {
 				if (path === null) {
 					const playerPosition = playerStore.position();
-					const scoredGrid = pathService.getScoredGrid(npc.position, true);
-					// Find the full path, but only keep the first 3 steps for this turn.
-					path = pathService.findPath(scoredGrid, playerPosition).slice(0, 3);
+
+					const dx = playerPosition.x - npc.position.x;
+					const dy = playerPosition.y - npc.position.y;
+
+
+					let moveX = dx !== 0;
+
+					if (dx !== 0 && dy !== 0) { 
+						// Choose randomaly the movement direction
+						moveX = Math.random() < 0.5;
+					}
+
+					// Break the ghost's movement into several steps
+					const nextSteps: Position[] = Array.from({ length: 2 }, () => ({ ...npc.position }));
+					nextSteps.forEach((step, index) => {
+						const stepIndex: number = index + 1;
+						if (moveX) {
+							step.x += dx > 0 ? stepIndex * 0.5 : -stepIndex * 0.5;
+						} else {
+							step.y += dy > 0 ? stepIndex * 0.5: -stepIndex * 0.5;
+						}
+					});
+
+					path = nextSteps;
+
 					soundPromise = audioService.playOneShotSound('ghost', npc.position.x, npc.position.y, 1.8);
 
 					if (path.length === 0) {
@@ -90,6 +117,7 @@ export const NPC_CONFIG: Record<string, NpcConfig> = {
 		return {
 			spriteType: 'shadow',
 			portrait: 'assets/static/shadow portrait.png',
+			movementStyle: 'ease-in',
 			action: async (npc: Npc, { audioService, playerStore, pathService, npcStore, characterQueueStore, gameStore }: NpcActionServices) => {
 				if (path === null) {
 					const playerPosition = playerStore.position();

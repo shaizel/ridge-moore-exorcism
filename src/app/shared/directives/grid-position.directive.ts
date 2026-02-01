@@ -52,7 +52,7 @@ export class GridPositionDirective {
 	 * Computes the 'z-index' CSS property based on the x and y position.
 	 */
 	public zIndex = computed(
-		() => 11 - this.appGridPosition().x + this.appGridPosition().y
+		() => 11 - this.appGridPosition().x + this.appGridPosition().y * 100
 	);
 
 	constructor() {}
